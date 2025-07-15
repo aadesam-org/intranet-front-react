@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
-import { ChevronRight, type LucideIcon } from "lucide-react"
+import { ChevronRight, type LucideIcon } from 'lucide-react'
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/shadcn/ui/collapsible"
+} from '@/components/shadcn/ui/collapsible'
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -16,9 +16,9 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/shadcn/ui/sidebar"
+} from '@/components/shadcn/ui/sidebar'
 
-export function NavMain({
+export function NavDAF({
   items,
 }: {
   items: {
@@ -34,9 +34,9 @@ export function NavMain({
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>Diretoria Administrativo-Financeiro</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
+        {items.map(item => (
           <Collapsible
             key={item.title}
             asChild
@@ -53,7 +53,7 @@ export function NavMain({
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
+                  {item.items?.map(subItem => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
                         <a href={subItem.url}>
