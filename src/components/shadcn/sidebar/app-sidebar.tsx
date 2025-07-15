@@ -130,11 +130,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild className="h-16">
+            <SidebarMenuButton size="lg" asChild className="h-20">
               <a href="#">
                 <div className="flex items-center justify-center p-4">
                   <Image
-                    src="/brand/aadesam-brand-white.png"
+                    src="/brand/aadesam-brand-white-full.png"
                     alt="Logo AADESAM"
                     className="object-contain"
                     priority

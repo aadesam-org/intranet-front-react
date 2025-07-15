@@ -34,7 +34,7 @@ export function NavDDA({
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Desenvolvimento Ambiental</SidebarGroupLabel>
+      <SidebarGroupLabel>Diretoria de Desenvolvimento Ambiental</SidebarGroupLabel>
       <SidebarMenu>
         {items.map(item => (
           <Collapsible
