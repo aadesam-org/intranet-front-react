@@ -63,7 +63,7 @@ const data = {
       items: [
         {
           title: 'TCE - e-Contas',
-          url: 'presidencia/col/tce',
+          url: 'presidencia/col/tce-json',
         },
       ],
     },
