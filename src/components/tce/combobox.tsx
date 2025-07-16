@@ -97,7 +97,7 @@ export function NaturezaDoProcedimento() {
 export function RegimeExecucaoObra() {
 	return (
 		<>
-			<Label htmlFor="cod-natureza-procedimento">Regime de Execução para Obras e Serviços de Engenharia</Label>
+			<Label htmlFor="cod-natureza-procedimento">Regime de Execução de Engenharia</Label>
 			<Select>
 				<SelectTrigger className="w-full">
 					<SelectValue placeholder="Selecione o regime de obra" />
@@ -113,4 +113,3 @@ export function RegimeExecucaoObra() {
 		</>
 	)
 }
-

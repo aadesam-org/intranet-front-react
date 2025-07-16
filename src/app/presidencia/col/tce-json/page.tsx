@@ -20,9 +20,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/shadcn/ui/card"
-import { InputNumericWithLabel, InputNumeroProcessoLicitatorio } from '@/components/tce/input'
+import { InputCurrencyBRL, InputNumberPNPC, InputNumericWithLabel, InputNumeroProcessoLicitatorio } from '@/components/tce/input'
 import { ModalidadeLicitacao, NaturezaDoObjeto, NaturezaDoProcedimento, RegimeExecucaoObra, TipoDeLicitacao } from '@/components/tce/combobox'
 import { TextareaWithLabel } from '@/components/tce/textarea'
+import { RadioGroup, RadioGroupItem } from '@/components/shadcn/ui/radio-group'
+import { Label } from '@/components/shadcn/ui/label'
+import { Calendar22 } from '@/components/shadcn/ui/select-date'
+import { Button } from '@/components/shadcn/ui/button'
 
 export default function Page() {
   const [modalidade, setModalidade] = useState<string | undefined>(undefined);
@@ -63,7 +67,7 @@ export default function Page() {
 							<CardDescription>Formulário para geração de arquivos de Atos Jurídicos no formato JSON, a ser enviado no Portal e-Contas do Tribunal de Contas do Estado do Amazonas, conforme a versão 2025.01.01 do layout do Manual de Remessa do TCE.</CardDescription>
 						</CardHeader>
 						<CardContent>
-							<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+							<div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="grid gap-3 w-full">
 									<InputNumericWithLabel id="cod-unidade-orcamentaria" label="Código da Unidade Orçamentária" placeholder="99001" defaultValue={99001} maxLength={6} required />
                 </div>
@@ -80,7 +84,7 @@ export default function Page() {
 						</CardContent>
 
 						<CardContent>
-							<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+							<div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
 								<div className="grid gap-3 w-full">
 									<NaturezaDoObjeto disabled={modalidade === "4" } />
                 </div>
@@ -90,27 +94,56 @@ export default function Page() {
 								<div className="grid gap-3 w-full">
 									<RegimeExecucaoObra />
 								</div>
+								<div className="grid gap-3 w-full">
+									<Calendar22 label="Competência" />
+								</div>
 							</div>
 						</CardContent>
+
 						<CardContent>
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4">
+							<div className="grid gap-3 w-full">
 								<TextareaWithLabel id="des-objeto-licitacao" label="Descrição do Objeto da Licitação" maxLength={300} />
 							</div>
+							<div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4">
+								<div className="grid gap-3 w-full">
+									<InputCurrencyBRL
+										id="valor-estimado"
+										title="Total da Despesa Prevista"
+										onValueChange={(valorDecimal) => {
+											console.log(valorDecimal);
+										}}
+									/>
+								</div>
+								<div className="grid gap-3 w-full">
+									<InputNumberPNPC />
+								</div>
+								<div className="grid gap-3 w-full justify-center">
+										<RadioGroup id="tp-item-lote" defaultValue="L">
+											<div className="flex items-center space-x-2">
+												<RadioGroupItem value="L" id="tp-lote" defaultChecked />
+												<Label htmlFor="tp-lote">Lote</Label>
+												<RadioGroupItem value="I" id="tp-item" />
+												<Label htmlFor="tp=item">Item</Label>
+											</div>
+										</RadioGroup>
+								</div>
+							</div>
+
+						</div>
 						</CardContent>
+						<Separator />
 						<CardFooter>
-							<p>Card Footer</p>
+							<div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 justify-center">
+								<Button>8.5 - LICITACAO.JSON</Button>
+								<Button>8.6 - ITEMLICITACAO.JSON</Button>
+								<Button>8.7 - LICITACAOHISTORICO.JSON</Button>
+								<Button>8.15 - PUBLICACAO.JSON</Button>
+							</div>
 						</CardFooter>
 					</Card>
 				</div>
 
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-            <div className="bg-muted/50 aspect-video rounded-xl" />
-          </div>
-          <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
-        </div>
       </SidebarInset>
     </SidebarProvider>
   )
