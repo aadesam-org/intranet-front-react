@@ -27,6 +27,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/shadcn/ui/radio-group'
 import { Label } from '@/components/shadcn/ui/label'
 import { Calendar22 } from '@/components/shadcn/ui/select-date'
 import { Button } from '@/components/shadcn/ui/button'
+import { NumeroEditalLicitacao } from '@/components/tce/input-num-edital-licitacao'
+import { CalendarYearMonthDay } from '@/components/shadcn/ui/select-calendar'
+import { InputLabelText } from '@/components/tce/input-text'
 
 export default function Page() {
   const [modalidade, setModalidade] = useState<string | undefined>(undefined);
@@ -66,8 +69,9 @@ export default function Page() {
 							<CardTitle className='text-3xl font-bold'>Arquivos de Atos Jurídicos</CardTitle>
 							<CardDescription>Formulário para geração de arquivos de Atos Jurídicos no formato JSON, a ser enviado no Portal e-Contas do Tribunal de Contas do Estado do Amazonas, conforme a versão 2025.01.01 do layout do Manual de Remessa do TCE.</CardDescription>
 						</CardHeader>
+
 						<CardContent>
-							<div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="grid gap-3 w-full">
 									<InputNumericWithLabel id="cod-unidade-orcamentaria" label="Código da Unidade Orçamentária" placeholder="99001" defaultValue={99001} maxLength={6} required />
                 </div>
@@ -75,16 +79,14 @@ export default function Page() {
 									<InputNumeroProcessoLicitatorio required />
                 </div>
 								<div className="grid gap-3 w-full">
+									<NumeroEditalLicitacao id="num-edital-licitacao" label="Número do Edital de Licitação" required />
+								</div>
+								<div className="grid gap-3 w-full">
+									<CalendarYearMonthDay label="Data de Publicação do Edital" required className="w-full" />
+								</div>
+								<div className="grid gap-3 w-full">
 									<ModalidadeLicitacao value={modalidade} onChange={setModalidade} />
                 </div>
-								<div className="grid gap-3 w-full">
-									<TipoDeLicitacao disabled={modalidade === "4" } />
-                </div>
-              </div>
-						</CardContent>
-
-						<CardContent>
-							<div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
 								<div className="grid gap-3 w-full">
 									<NaturezaDoObjeto disabled={modalidade === "4" } />
                 </div>
@@ -97,44 +99,66 @@ export default function Page() {
 								<div className="grid gap-3 w-full">
 									<Calendar22 label="Competência" />
 								</div>
-							</div>
+								<div className="grid gap-3 w-full">
+									<CalendarYearMonthDay label="Limite para Envio da Proposta" />
+								</div>
+								<div className="grid gap-3 w-full">
+									<InputNumericWithLabel id="num-diario-oficial" label="Número do Diário Oficial" placeholder="35454" maxLength={6} required />
+                </div>
+								<div className="grip gap-3 w-full">
+									<InputLabelText id="nome-veiculo-comunicacao" label="Veículo de Comunicação" placeholder="Diário Oficial do Estado do Amazonas" defaultValue={"Diário Oficial do Estado do Amazonas"} maxLength={50} required className='mt-3'/>
+								</div>
+              </div>
 						</CardContent>
 
 						<CardContent>
-						<div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4">
-							<div className="grid gap-3 w-full">
-								<TextareaWithLabel id="des-objeto-licitacao" label="Descrição do Objeto da Licitação" maxLength={300} />
-							</div>
-							<div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4">
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
 								<div className="grid gap-3 w-full">
-									<InputCurrencyBRL
-										id="valor-estimado"
-										title="Total da Despesa Prevista"
-										onValueChange={(valorDecimal) => {
-											console.log(valorDecimal);
-										}}
-									/>
+									<TextareaWithLabel id="des-objeto-licitacao" label="Descrição do Objeto da Licitação" maxLength={300} />
 								</div>
-								<div className="grid gap-3 w-full">
-									<InputNumberPNPC />
-								</div>
-								<div className="grid gap-3 w-full justify-center">
-										<RadioGroup id="tp-item-lote" defaultValue="L">
-											<div className="flex items-center space-x-2">
-												<RadioGroupItem value="L" id="tp-lote" defaultChecked />
-												<Label htmlFor="tp-lote">Lote</Label>
-												<RadioGroupItem value="I" id="tp-item" />
-												<Label htmlFor="tp=item">Item</Label>
-											</div>
-										</RadioGroup>
+								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+									<div className="grid gap-3 w-full">
+										<InputCurrencyBRL
+											id="valor-estimado"
+											title="Total da Despesa Prevista"
+											onValueChange={(valorDecimal) => {
+												console.log(valorDecimal);
+											}}
+										/>
+									</div>
+									<div className="grid gap-3 w-full">
+										<InputNumberPNPC />
+									</div>
+									<div className="grid gap-3 w-full">
+										<TipoDeLicitacao disabled={modalidade === "4" } />
+									</div>
+									<div className="grid gap-3 w-full justify-center">
+											<RadioGroup id="tp-item-lote" defaultValue="L">
+												<div className="flex items-center space-x-2">
+													<RadioGroupItem value="L" id="tp-lote" defaultChecked />
+													<Label htmlFor="tp-lote">Lote</Label>
+													<RadioGroupItem value="I" id="tp-item" />
+													<Label htmlFor="tp=item">Item</Label>
+												</div>
+											</RadioGroup>
+									</div>
 								</div>
 							</div>
-
-						</div>
 						</CardContent>
+
 						<Separator />
+
+						<CardContent>
+							<div className='text-2xl font-bold'>Itens da Licitação</div>
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+              </div>
+						</CardContent>
+
+						<Separator />
+
 						<CardFooter>
-							<div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 justify-center">
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 justify-center">
 								<Button>8.5 - LICITACAO.JSON</Button>
 								<Button>8.6 - ITEMLICITACAO.JSON</Button>
 								<Button>8.7 - LICITACAOHISTORICO.JSON</Button>

@@ -7,16 +7,24 @@ import { Label } from "@/components/shadcn/ui/label"
 import { Calendar } from "@/components/shadcn/ui/calendar"
 
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/shadcn/ui/popover"
+import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
 
+export function CalendarYearMonthDay({ label, ...props }: {
+	label: string,
+	className?: string,
+	required?: boolean
+}) {
 
-export function Calendar22({ label, className }: { label: string, className?: string }) {
   const [open, setOpen] = React.useState(false)
   const [date, setDate] = React.useState<Date | undefined>(undefined)
+
   return (
     <>
       <Label htmlFor="date" className="px-1 w-full">
-        {label}
+        {label}{props.required && <span className="text-red-500 ml-1">*</span>}
       </Label>
+
       <Popover open={open} onOpenChange={setOpen} >
         <PopoverTrigger asChild>
           <Button
@@ -24,7 +32,7 @@ export function Calendar22({ label, className }: { label: string, className?: st
             id="date"
             className="w-48 justify-between font-normal"
           >
-            {date ? date.toLocaleDateString() : "Ano e Mês"}
+            {date ? format(date, "dd/MM/yyyy", { locale: ptBR }) : "Selecione a Data"}
             <ChevronDownIcon />
           </Button>
         </PopoverTrigger>
@@ -39,12 +47,8 @@ export function Calendar22({ label, className }: { label: string, className?: st
               }
             }}
             captionLayout="dropdown"
-            fromYear={2020}
-            toYear={new Date().getFullYear()}
+            startMonth={new Date(2010, 0, 1)}
             disabled={(d) => d > new Date()}
-            classNames={{
-              day: "hidden",
-            }}
           />
         </PopoverContent>
       </Popover>
