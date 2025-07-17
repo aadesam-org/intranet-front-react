@@ -3,19 +3,19 @@
 import { Input } from "@/components/shadcn/ui/input"
 import { Label } from "@/components/shadcn/ui/label"
 
-interface InputLabelTextProps extends React.ComponentProps<"input"> {
+interface InputIntegerProps extends React.ComponentProps<"input"> {
   label: string
   maxLength?: number
 }
 
-export function InputLabelText({
+export function InputInteger({
   id,
   label,
   className,
   maxLength,
   onChange,
   ...props
-}: InputLabelTextProps) {
+}: InputIntegerProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -29,14 +29,16 @@ export function InputLabelText({
 
   return (
     <>
-      <Label htmlFor={id}>{label}{props.required && <span className="text-red-500 ml-1">*</span>}</Label>
+      <Label htmlFor={id} className="">{label}{props.required && <span className="text-red-500 ml-1">*</span>}</Label>
       <Input
         id={id}
-        type="text"
+        type="number"
+        inputMode="numeric"
+        pattern="[0-9]*"
         maxLength={maxLength}
 				placeholder={props.placeholder}
 				required
-        className={`appearance-none ${className ?? ""}`}
+        className={`appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [MozAppearance:textfield] ${className ?? ""}`}
         onChange={handleChange}
         {...props}
       />

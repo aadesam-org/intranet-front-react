@@ -29,7 +29,9 @@ import { Calendar22 } from '@/components/shadcn/ui/select-date'
 import { Button } from '@/components/shadcn/ui/button'
 import { NumeroEditalLicitacao } from '@/components/tce/input-num-edital-licitacao'
 import { CalendarYearMonthDay } from '@/components/shadcn/ui/select-calendar'
-import { InputLabelText } from '@/components/tce/input-text'
+import { InputString } from '@/components/tce/input-string'
+import { InputDecimal } from '@/components/tce/input-decimal'
+import { InputInteger } from '@/components/tce/input-integer'
 
 export default function Page() {
   const [modalidade, setModalidade] = useState<string | undefined>(undefined);
@@ -82,7 +84,7 @@ export default function Page() {
 									<NumeroEditalLicitacao id="num-edital-licitacao" label="Número do Edital de Licitação" required />
 								</div>
 								<div className="grid gap-3 w-full">
-									<CalendarYearMonthDay label="Data de Publicação do Edital" required className="w-full" />
+									<CalendarYearMonthDay label="Data de Publicação do Edital" id="dt-publicacao-edital" required className="w-full" />
 								</div>
 								<div className="grid gap-3 w-full">
 									<ModalidadeLicitacao value={modalidade} onChange={setModalidade} />
@@ -100,13 +102,13 @@ export default function Page() {
 									<Calendar22 label="Competência" />
 								</div>
 								<div className="grid gap-3 w-full">
-									<CalendarYearMonthDay label="Limite para Envio da Proposta" />
+									<CalendarYearMonthDay label="Limite para Envio da Proposta" id="dt-limite-propostas"/>
 								</div>
 								<div className="grid gap-3 w-full">
 									<InputNumericWithLabel id="num-diario-oficial" label="Número do Diário Oficial" placeholder="35454" maxLength={6} required />
                 </div>
 								<div className="grip gap-3 w-full">
-									<InputLabelText id="nome-veiculo-comunicacao" label="Veículo de Comunicação" placeholder="Diário Oficial do Estado do Amazonas" defaultValue={"Diário Oficial do Estado do Amazonas"} maxLength={50} required className='mt-3'/>
+									<InputString id="nome-veiculo-comunicacao" label="Veículo de Comunicação" placeholder="Diário Oficial do Estado do Amazonas" defaultValue={"Diário Oficial do Estado do Amazonas"} maxLength={50} required className='mt-3'/>
 								</div>
               </div>
 						</CardContent>
@@ -146,13 +148,41 @@ export default function Page() {
 							</div>
 						</CardContent>
 
-						<Separator />
-
 						<CardContent>
-							<div className='text-2xl font-bold'>Itens da Licitação</div>
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+							<Card>
+								<CardHeader className='text-2xl font-bold'>Itens da Licitação</CardHeader>
+								<CardContent>
+									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+									  <div className="grid gap-3 max-w-3/6">
+											<InputInteger id="num-sequencial-item" label="No." maxLength={5} placeholder="1" required />
+								    </div>
+										<div className="grid gap-3 w-full">
+											<InputDecimal id="qt-item-solicitado" label='Quantidade' maxLength={16} required />
+										</div>
+										<div className="grid gap-3 w-full">
+											<InputString id='unidade-medida' label='Unidade de Medida' maxLength={30} required />
+										</div>
+										<div className="grid gap-3 w-full">
+											<CalendarYearMonthDay label='Homologação do Item' id='dt-homologacao-item' />
+										</div>
+										<div className="grid gap-3 w-full">
+											<CalendarYearMonthDay label='Publicação da Homologação' id='dt-publicacao-homologacao' />
+										</div>
+										<div className="grid gap-3 w-full">
+											<InputString id='cod-item-lote' label='Código do Lote' maxLength={10} required />
+										</div>
+                  </div>
+									<div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
+										<div className="grid gap-3 w-full mt-3">
+											<TextareaWithLabel id="des-objeto-licitacao" label="Descrição do Objeto da Licitação" maxLength={300} />
+										</div>
+									</div>
 
-              </div>
+
+								</CardContent>
+							</Card>
+
+
 						</CardContent>
 
 						<Separator />

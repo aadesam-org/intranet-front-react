@@ -10,8 +10,9 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/shadcn/ui/
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
-export function CalendarYearMonthDay({ label, ...props }: {
+export function CalendarYearMonthDay({ label, id,...props }: {
 	label: string,
+	id: string,
 	className?: string,
 	required?: boolean
 }) {
@@ -21,7 +22,7 @@ export function CalendarYearMonthDay({ label, ...props }: {
 
   return (
     <>
-      <Label htmlFor="date" className="px-1 w-full">
+      <Label htmlFor={id} className="px-1 w-full">
         {label}{props.required && <span className="text-red-500 ml-1">*</span>}
       </Label>
 
@@ -38,6 +39,7 @@ export function CalendarYearMonthDay({ label, ...props }: {
         </PopoverTrigger>
         <PopoverContent className="overflow-hidden p-0 w-full" align="start">
           <Calendar
+						id={id}
             mode="single"
             selected={date}
             onSelect={(d) => {
