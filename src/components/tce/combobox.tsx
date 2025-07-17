@@ -82,7 +82,7 @@ export function NaturezaDoProcedimento() {
 			<Label htmlFor="cod-natureza-procedimento">Natureza do Procedimento<span className="text-red-500 ml-1">*</span></Label>
 			<Select>
 				<SelectTrigger className="w-full">
-					<SelectValue placeholder="Selecione a natureza do procedimento" />
+					<SelectValue placeholder="Selecione o procedimento" />
 				</SelectTrigger>
 				<SelectContent>
 					<SelectItem value="1">01 - Normal</SelectItem>

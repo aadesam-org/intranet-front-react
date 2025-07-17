@@ -88,26 +88,21 @@ interface InputCurrencyBRLProps extends React.InputHTMLAttributes<HTMLInputEleme
 }
 
 function formatCurrencyBRL(value: string): string {
-  // Remove tudo que não for número
   const onlyNumbers = value.replace(/\D/g, "");
   if (!onlyNumbers) return "";
-  // Limita a 16 dígitos
-  const limited = onlyNumbers.slice(0, 16);
-  // Converte para centavos
-  const number = parseFloat(limited) / 100;
-  // Formata para BRL
-  return number.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+  const limitedNumber = onlyNumbers.slice(0, 16);
+  const numberCents = parseFloat(limitedNumber) / 100;
+  return numberCents.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 function getRawValue(value: string): string {
-  // Remove tudo que não for número
   const onlyNumbers = value.replace(/\D/g, "");
   if (!onlyNumbers) return "";
-  // Limita a 16 dígitos
-  const limited = onlyNumbers.slice(0, 16);
-  // Converte para centavos e retorna no formato 1000000.00
-  const number = parseFloat(limited) / 100;
-  return number.toFixed(2);
+
+  const limitedNumber = onlyNumbers.slice(0, 16);
+  const numberCents = parseFloat(limitedNumber) / 100;
+  return numberCents.toFixed(2);
 }
 
 export function InputCurrencyBRL({ id, title, required, value, onChange, onValueChange, ...props }: InputCurrencyBRLProps) {
@@ -121,15 +116,13 @@ export function InputCurrencyBRL({ id, title, required, value, onChange, onValue
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    // Remove tudo que não for número
     const onlyNumbers = inputValue.replace(/\D/g, "");
-    // Limita a 16 dígitos
-    const limited = onlyNumbers.slice(0, 16);
-    // Formata para BRL
-    const masked = formatCurrencyBRL(limited);
+    const limitedNumber = onlyNumbers.slice(0, 16);
+    // Formatando para BRL
+    const masked = formatCurrencyBRL(limitedNumber);
     setInternalValue(masked);
     if (onValueChange) {
-      onValueChange(getRawValue(limited));
+      onValueChange(getRawValue(limitedNumber));
     }
     if (onChange) {
       // Cria um novo evento com o valor mascarado
@@ -156,7 +149,7 @@ export function InputCurrencyBRL({ id, title, required, value, onChange, onValue
         placeholder="R$ 1.000.000,00"
         className={props.className}
         required={required}
-        maxLength={23} // R$ 9.999.999.999.999,99
+        maxLength={23}
         value={internalValue}
         onChange={handleChange}
         inputMode="numeric"
@@ -174,19 +167,18 @@ interface InputNumberPNPCProps extends React.InputHTMLAttributes<HTMLInputElemen
 }
 
 function maskPNPC(value: string): string {
-  // Remove tudo que não for número
   value = value.replace(/\D/g, "");
-  // Aplica a máscara: 99999999999999-1-999999/9999
+  // Máscara: 99999999999999-1-999999/9999
   let masked = value;
   if (masked.length > 14) masked = masked.slice(0, 14) + '-' + masked.slice(14);
   if (masked.length > 16) masked = masked.slice(0, 16) + '-' + masked.slice(16);
   if (masked.length > 23) masked = masked.slice(0, 23) + '/' + masked.slice(23);
-  return masked.slice(0, 28); // Limita ao tamanho máximo da máscara
+  return masked.slice(0, 28);
 }
 
 export function InputNumberPNPC({
   id = "id-contratacao-pncp",
-  label = "Número do Controle da Contratação no PNCP",
+  label = "Número do PNCP",
   className,
   required,
   value,

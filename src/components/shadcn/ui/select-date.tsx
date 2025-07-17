@@ -13,7 +13,7 @@ export function Calendar22({ label }: { label: string }) {
   const [open, setOpen] = React.useState(false)
   const [date, setDate] = React.useState<Date | undefined>(undefined)
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <div className="flex flex-col gap-3" >
       <Label htmlFor="date" className="px-1">
         {label}
       </Label>
@@ -28,7 +28,7 @@ export function Calendar22({ label }: { label: string }) {
             <ChevronDownIcon />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+        <PopoverContent className="overflow-hidden p-0 w-full" align="start">
           <Calendar
             mode="single"
             selected={date}
