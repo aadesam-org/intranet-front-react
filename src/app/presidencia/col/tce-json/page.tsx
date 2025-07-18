@@ -33,6 +33,7 @@ import { InputString } from '@/components/tce/input-string'
 import { InputDecimal } from '@/components/tce/input-decimal'
 import { InputInteger } from '@/components/tce/input-integer'
 import { Table } from '@/components/shadcn/ui/table'
+import { TableItemLicitacao } from '@/components/tce/table-item-licitacao'
 
 export default function Page() {
   const [modalidade, setModalidade] = useState<string | undefined>(undefined);
@@ -196,7 +197,7 @@ export default function Page() {
 								</CardContent>
 								<Separator />
 								<CardContent>
-									<Table />
+									<TableItemLicitacao />
 								</CardContent>
 							</Card>
 
