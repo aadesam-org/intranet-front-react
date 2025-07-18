@@ -113,3 +113,24 @@ export function RegimeExecucaoObra() {
 		</>
 	)
 }
+
+export function Status() {
+	return (
+		<>
+			<Label htmlFor="cod-natureza-procedimento">Status<span className="text-red-500 ml-1">*</span></Label>
+			<Select>
+				<SelectTrigger className="w-full">
+					<SelectValue placeholder="Selecione o status" />
+				</SelectTrigger>
+				<SelectContent>
+					<SelectItem value="1">01 - Homologação</SelectItem>
+					<SelectItem value="2">02 - Cancelado</SelectItem>
+					<SelectItem value="3">03 - Anulado</SelectItem>
+					<SelectItem value="4">04 - Revogado</SelectItem>
+					<SelectItem value="5">05 - Deserto</SelectItem>
+					<SelectItem value="6">06 - Fracassado</SelectItem>
+				</SelectContent>
+			</Select>
+		</>
+	)
+}

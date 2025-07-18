@@ -21,7 +21,7 @@ import {
   CardTitle,
 } from "@/components/shadcn/ui/card"
 import { InputCurrencyBRL, InputNumberPNPC, InputNumericWithLabel, InputNumeroProcessoLicitatorio } from '@/components/tce/input'
-import { ModalidadeLicitacao, NaturezaDoObjeto, NaturezaDoProcedimento, RegimeExecucaoObra, TipoDeLicitacao } from '@/components/tce/combobox'
+import { ModalidadeLicitacao, NaturezaDoObjeto, NaturezaDoProcedimento, RegimeExecucaoObra, Status, TipoDeLicitacao } from '@/components/tce/combobox'
 import { TextareaWithLabel } from '@/components/tce/textarea'
 import { RadioGroup, RadioGroupItem } from '@/components/shadcn/ui/radio-group'
 import { Label } from '@/components/shadcn/ui/label'
@@ -32,6 +32,7 @@ import { CalendarYearMonthDay } from '@/components/shadcn/ui/select-calendar'
 import { InputString } from '@/components/tce/input-string'
 import { InputDecimal } from '@/components/tce/input-decimal'
 import { InputInteger } from '@/components/tce/input-integer'
+import { Table } from '@/components/shadcn/ui/table'
 
 export default function Page() {
   const [modalidade, setModalidade] = useState<string | undefined>(undefined);
@@ -152,36 +153,52 @@ export default function Page() {
 							<Card>
 								<CardHeader className='text-2xl font-bold'>Itens da Licitação</CardHeader>
 								<CardContent>
-									<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-									  <div className="grid gap-3 max-w-3/6">
-											<InputInteger id="num-sequencial-item" label="No." maxLength={5} placeholder="1" required />
-								    </div>
-										<div className="grid gap-3 w-full">
-											<InputDecimal id="qt-item-solicitado" label='Quantidade' maxLength={16} required />
+									<div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+
+										<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+											<div className="grid gap-3 w-full">
+												<InputInteger id="num-sequencial-item" label="No." maxLength={5} placeholder="1" required />
+											</div>
+											<div className='grid gap-3 w-full'>
+												<Status />
+											</div>
+											<div className="grid gap-3 w-full">
+												<CalendarYearMonthDay label='Homologação do Item' id='dt-homologacao-item' />
+											</div>
+											<div className="grid gap-3 w-full">
+												<CalendarYearMonthDay label='Publicação da Homologação' id='dt-publicacao-homologacao' />
+											</div>
 										</div>
-										<div className="grid gap-3 w-full">
-											<InputString id='unidade-medida' label='Unidade de Medida' maxLength={30} required />
-										</div>
-										<div className="grid gap-3 w-full">
-											<CalendarYearMonthDay label='Homologação do Item' id='dt-homologacao-item' />
-										</div>
-										<div className="grid gap-3 w-full">
-											<CalendarYearMonthDay label='Publicação da Homologação' id='dt-publicacao-homologacao' />
-										</div>
-										<div className="grid gap-3 w-full">
-											<InputString id='cod-item-lote' label='Código do Lote' maxLength={10} required />
-										</div>
-                  </div>
-									<div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
-										<div className="grid gap-3 w-full mt-3">
-											<TextareaWithLabel id="des-objeto-licitacao" label="Descrição do Objeto da Licitação" maxLength={300} />
+
+										<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4'>
+											<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4'>
+												<div className="grid gap-3 w-full">
+													<InputDecimal id="qt-item-solicitado" label='Quantidade' placeholder='152.50' maxLength={16} required />
+												</div>
+												<div className="grid gap-3 w-full">
+													<InputString id='unidade-medida' label='Unidade de Medida' placeholder='KG / L / UND / etc.' maxLength={30} required />
+												</div>
+												<div className="grid gap-3 w-full">
+													<InputString id='cod-item-lote' label='Código do Lote' placeholder='LOTE01' title='Obrigatório se o Tipo de Licitação for igual a LOTE' maxLength={10} required />
+												</div>
+											</div>
+
+											<div className='grid md:grid-cols-1 gap-3 w-full'>
+												<div className="grid gap-3 w-full">
+													<TextareaWithLabel id="des-objeto-licitacao" label="Descrição do Objeto da Licitação" className="w-full h-26" maxLength={300} />
+												</div>
+												<div className="grid gap-3 w-full">
+													<Button className='bg-green-900 text-white hover:bg-green-700 hover:text-lg active:bg-green-600 active:scale-95 transition-all duration-150'>ADICIONAR ITEM</Button>
+												</div>
+											</div>
 										</div>
 									</div>
-
-
+								</CardContent>
+								<Separator />
+								<CardContent>
+									<Table />
 								</CardContent>
 							</Card>
-
 
 						</CardContent>
 

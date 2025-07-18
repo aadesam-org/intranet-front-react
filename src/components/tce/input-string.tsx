@@ -2,6 +2,7 @@
 
 import { Input } from "@/components/shadcn/ui/input"
 import { Label } from "@/components/shadcn/ui/label"
+import { Info } from "lucide-react"
 
 interface InputStringProps extends React.ComponentProps<"input"> {
   label: string

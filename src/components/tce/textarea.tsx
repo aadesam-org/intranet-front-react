@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Label } from "../shadcn/ui/label"
 import { Textarea } from "../shadcn/ui/textarea"
 
-export function TextareaWithLabel({ id, label, value, maxLength, ...props }: {
+export function TextareaWithLabel({ id, label, value, maxLength, className, ...props }: {
 	id: string,
 	label: string,
 	value?: string,
 	maxLength?: number,
+	className?: string,
 }) {
 	const [text, setText] = useState('');
 
@@ -23,7 +24,7 @@ export function TextareaWithLabel({ id, label, value, maxLength, ...props }: {
 				id={id}
 				value={text}
 				maxLength={maxLength}
-				className="w-full"
+				className={className}
 				onChange={onTextChange}
 				{...props}
 			/>
