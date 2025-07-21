@@ -114,15 +114,25 @@ export function RegimeExecucaoObra() {
 	)
 }
 
-export function Status() {
+export function Status({ id, value, onChange }: { id: string, value?: string, onChange?: (e: any) => void }) {
+
+	const statusLabels: Record<string, string> = {
+		"1": "Homologação",
+		"2": "Cancelado",
+		"3": "Anulado",
+		"4": "Revogado",
+		"5": "Deserto",
+		"6": "Fracassado",
+	};
+
 	return (
 		<>
-			<Label htmlFor="cod-natureza-procedimento">Status<span className="text-red-500 ml-1">*</span></Label>
-			<Select>
+			<Label htmlFor={id}>Status<span className="text-red-500 ml-1">*</span></Label>
+			<Select value={value} onValueChange={val => onChange && onChange({ target: { id, value: val } })}>
 				<SelectTrigger className="w-full">
 					<SelectValue placeholder="Selecione o status" />
 				</SelectTrigger>
-				<SelectContent>
+				<SelectContent id={id}>
 					<SelectItem value="1">01 - Homologação</SelectItem>
 					<SelectItem value="2">02 - Cancelado</SelectItem>
 					<SelectItem value="3">03 - Anulado</SelectItem>

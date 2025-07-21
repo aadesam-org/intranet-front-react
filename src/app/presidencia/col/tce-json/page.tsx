@@ -32,11 +32,74 @@ import { CalendarYearMonthDay } from '@/components/shadcn/ui/select-calendar'
 import { InputString } from '@/components/tce/input-string'
 import { InputDecimal } from '@/components/tce/input-decimal'
 import { InputInteger } from '@/components/tce/input-integer'
-import { Table } from '@/components/shadcn/ui/table'
 import { TableItemLicitacao } from '@/components/tce/table-item-licitacao'
+
+// Tipos para os itens e formulário
+interface ItemType {
+  'num-sequencial-item': string;
+  'qt-item-solicitado': string;
+  'unidade-medida': string;
+  'cod-item-lote': string;
+  'des-objeto-licitacao': string;
+  'status-item-licitacao': string;
+  'dt-homologacao-item': string;
+  'dt-publicacao-homologacao': string;
+}
+
+// Pode ser igual ao ItemType
+type FormType = ItemType;
+
+const valoresIniciais: FormType = {
+  'num-sequencial-item': '',
+  'qt-item-solicitado': '',
+  'unidade-medida': '',
+  'cod-item-lote': '',
+  'des-objeto-licitacao': '',
+  'status-item-licitacao': '',
+  'dt-homologacao-item': '',
+  'dt-publicacao-homologacao': '',
+};
 
 export default function Page() {
   const [modalidade, setModalidade] = useState<string | undefined>(undefined);
+  const [itens, setItens] = useState<ItemType[]>([]);
+  const [form, setForm] = useState<FormType>(valoresIniciais);
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+
+  // Função para lidar com mudança dos campos do formulário
+  function handleChange(e: { target: { id: string, value: string } }) {
+    setForm({ ...form, [e.target.id]: e.target.value });
+    // Log para depuração
+    if (e.target.id === 'dt-homologacao-item' || e.target.id === 'dt-publicacao-homologacao') {
+      console.log('Data alterada:', e.target.id, e.target.value);
+    }
+  }
+
+  // Adicionar ou editar item
+  function handleAddOrEdit() {
+    if (editIndex !== null) {
+      // Editar
+      const novosItens = [...itens];
+      novosItens[editIndex] = form;
+      setItens(novosItens);
+      setEditIndex(null);
+    } else {
+      // Adicionar
+      setItens([...itens, form]);
+    }
+    setForm(valoresIniciais); // Limpa o formulário
+  }
+
+  // Preencher formulário para edição
+  function handleEdit(index: number) {
+    setForm(itens[index]);
+    setEditIndex(index);
+  }
+
+  // Excluir item
+  function handleDelete(index: number) {
+    setItens(itens.filter((_, i) => i !== index));
+  }
 
   return (
     <SidebarProvider>
@@ -151,53 +214,113 @@ export default function Page() {
 						</CardContent>
 
 						<CardContent>
-							<Card>
+							<Card id='card-itens-licitacao'>
 								<CardHeader className='text-2xl font-bold'>Itens da Licitação</CardHeader>
 								<CardContent>
 									<div className="grid grid-cols-1 md:grid-cols-1 gap-4">
 
 										<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
 											<div className="grid gap-3 w-full">
-												<InputInteger id="num-sequencial-item" label="No." maxLength={5} placeholder="1" required />
+												<InputInteger
+													id="num-sequencial-item"
+													label="No."
+													maxLength={5}
+													placeholder="1"
+													required
+													value={form['num-sequencial-item']}
+													onChange={handleChange}
+												/>
 											</div>
 											<div className='grid gap-3 w-full'>
-												<Status />
+												<Status
+													id='status-item-licitacao'
+													value={form['status-item-licitacao']}
+													onChange={handleChange}
+												/>
 											</div>
 											<div className="grid gap-3 w-full">
-												<CalendarYearMonthDay label='Homologação do Item' id='dt-homologacao-item' />
+												<CalendarYearMonthDay
+													label='Homologação do Item'
+													id='dt-homologacao-item'
+													value={form['dt-homologacao-item']}
+													onChange={handleChange}
+												/>
 											</div>
 											<div className="grid gap-3 w-full">
-												<CalendarYearMonthDay label='Publicação da Homologação' id='dt-publicacao-homologacao' />
+												<CalendarYearMonthDay
+													label='Publicação da Homologação'
+													id='dt-publicacao-homologacao'
+													value={form['dt-publicacao-homologacao']}
+													onChange={handleChange}
+												/>
 											</div>
 										</div>
 
 										<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4'>
 											<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4'>
 												<div className="grid gap-3 w-full">
-													<InputDecimal id="qt-item-solicitado" label='Quantidade' placeholder='152.50' maxLength={16} required />
+													<InputDecimal
+														id="qt-item-solicitado"
+														label='Quantidade'
+														placeholder='152.50'
+														maxLength={16}
+														required
+														value={form['qt-item-solicitado']}
+														onChange={handleChange}
+													/>
 												</div>
 												<div className="grid gap-3 w-full">
-													<InputString id='unidade-medida' label='Unidade de Medida' placeholder='KG / L / UND / etc.' maxLength={30} required />
+													<InputString
+														id='unidade-medida'
+														label='Unidade de Medida'
+														placeholder='KG / L / UND / etc.'
+														maxLength={30}
+														required
+														value={form['unidade-medida']}
+														onChange={handleChange}
+													/>
 												</div>
 												<div className="grid gap-3 w-full">
-													<InputString id='cod-item-lote' label='Código do Lote' placeholder='LOTE01' title='Obrigatório se o Tipo de Licitação for igual a LOTE' maxLength={10} required />
+													<InputString
+														id='cod-item-lote'
+														label='Código do Lote'
+														placeholder='LOTE01'
+														title='Obrigatório se o Tipo de Licitação for igual a LOTE'
+														maxLength={10}
+														required
+														value={form['cod-item-lote']}
+														onChange={handleChange}
+													/>
 												</div>
 											</div>
 
 											<div className='grid md:grid-cols-1 gap-3 w-full'>
 												<div className="grid gap-3 w-full">
-													<TextareaWithLabel id="des-objeto-licitacao" label="Descrição do Objeto da Licitação" className="w-full h-26" maxLength={300} />
+													<TextareaWithLabel
+														id="des-objeto-licitacao"
+														label="Descrição do Objeto da Licitação"
+														className="w-full h-26"
+														maxLength={300}
+														value={form['des-objeto-licitacao']}
+														onChange={handleChange}
+													/>
 												</div>
 												<div className="grid gap-3 w-full">
-													<Button className='bg-green-900 text-white hover:bg-green-700 hover:text-lg active:bg-green-600 active:scale-95 transition-all duration-150'>ADICIONAR ITEM</Button>
+													<Button id='btn-adicionar-item' onClick={handleAddOrEdit} className='bg-green-900 text-white hover:bg-green-700 hover:text-lg active:bg-green-600 active:scale-95 transition-all duration-150'>
+														{editIndex !== null ? 'SALVAR ALTERAÇÕES' : 'ADICIONAR ITEM'}
+													</Button>
 												</div>
 											</div>
 										</div>
 									</div>
 								</CardContent>
 								<Separator />
-								<CardContent>
-									<TableItemLicitacao />
+								<CardContent id='card-content-itens-licitacao'>
+									<TableItemLicitacao
+										itens={itens}
+										onEdit={handleEdit}
+										onDelete={handleDelete}
+									/>
 								</CardContent>
 							</Card>
 

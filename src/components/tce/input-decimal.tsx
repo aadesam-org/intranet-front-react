@@ -20,7 +20,8 @@ export function InputDecimal({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
 
-    if (/^\d*$/.test(value)) {
+    // Permitir números decimais (ponto ou vírgula)
+    if (/^\d*[\.,]?\d*$/.test(value)) {
       if (!maxLength || value.length <= maxLength) {
         onChange?.(e)
       }

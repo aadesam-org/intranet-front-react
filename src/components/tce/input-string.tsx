@@ -20,11 +20,8 @@ export function InputString({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
-
-    if (/^\d*$/.test(value)) {
-      if (!maxLength || value.length <= maxLength) {
-        onChange?.(e)
-      }
+    if (!maxLength || value.length <= maxLength) {
+      onChange?.(e)
     }
   }
 
