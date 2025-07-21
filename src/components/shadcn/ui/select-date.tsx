@@ -9,19 +9,19 @@ import { Calendar } from "@/components/shadcn/ui/calendar"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/shadcn/ui/popover"
 
 
-export function Calendar22({ label, className }: { label: string, className?: string }) {
+export function CalendarYearMonth({ label, id, className }: { label: string, id: string, className?: string }) {
   const [open, setOpen] = React.useState(false)
   const [date, setDate] = React.useState<Date | undefined>(undefined)
   return (
     <>
-      <Label htmlFor="date" className="px-1 w-full">
+      <Label htmlFor={id} className="px-1 w-full">
         {label}
       </Label>
       <Popover open={open} onOpenChange={setOpen} >
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            id="date"
+            id={id}
             className="w-full justify-between font-normal"
           >
             {date ? date.toLocaleDateString() : "Ano e Mês"}
@@ -30,6 +30,7 @@ export function Calendar22({ label, className }: { label: string, className?: st
         </PopoverTrigger>
         <PopoverContent className="overflow-hidden p-0 w-full" align="start">
           <Calendar
+						id={id}
             mode="single"
             selected={date}
             onSelect={(d) => {
@@ -39,8 +40,7 @@ export function Calendar22({ label, className }: { label: string, className?: st
               }
             }}
             captionLayout="dropdown"
-            fromYear={2020}
-            toYear={new Date().getFullYear()}
+            startMonth={new Date(2010, 0, 1)}
             disabled={(d) => d > new Date()}
             classNames={{
               day: "hidden",

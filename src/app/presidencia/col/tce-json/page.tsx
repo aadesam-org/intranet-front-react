@@ -25,7 +25,7 @@ import { ModalidadeLicitacao, NaturezaDoObjeto, NaturezaDoProcedimento, RegimeEx
 import { TextareaWithLabel } from '@/components/tce/textarea'
 import { RadioGroup, RadioGroupItem } from '@/components/shadcn/ui/radio-group'
 import { Label } from '@/components/shadcn/ui/label'
-import { Calendar22 } from '@/components/shadcn/ui/select-date'
+import { CalendarYearMonth } from '@/components/shadcn/ui/select-date'
 import { Button } from '@/components/shadcn/ui/button'
 import { NumeroEditalLicitacao } from '@/components/tce/input-num-edital-licitacao'
 import { CalendarYearMonthDay } from '@/components/shadcn/ui/select-calendar'
@@ -164,7 +164,7 @@ export default function Page() {
 									<RegimeExecucaoObra />
 								</div>
 								<div className="grid gap-3 w-full">
-									<Calendar22 label="Competência" />
+									<CalendarYearMonth label="Competência" id="dt-competencia" />
 								</div>
 								<div className="grid gap-3 w-full">
 									<CalendarYearMonthDay label="Limite para Envio da Proposta" id="dt-limite-propostas"/>
@@ -330,10 +330,30 @@ export default function Page() {
 
 						<CardFooter>
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 justify-center">
-								<Button>8.5 - LICITACAO.JSON</Button>
-								<Button>8.6 - ITEMLICITACAO.JSON</Button>
-								<Button>8.7 - LICITACAOHISTORICO.JSON</Button>
-								<Button>8.15 - PUBLICACAO.JSON</Button>
+								<Button
+									id='btn-gerar-licitacao-json'
+									className='hover:bg-gray-700 active:bg-green-600 active:scale-95'
+								>
+									8.5 - LICITACAO.JSON
+								</Button>
+								<Button
+									id='btn-gerar-itemlicitacao-json'
+									className='hover:bg-gray-700 active:bg-green-600 active:scale-95'
+								>
+									8.6 - ITEMLICITACAO.JSON
+								</Button>
+								<Button
+									id='btn-gerar-licitacaohistorico-json'
+									className='hover:bg-gray-700 active:bg-green-600 active:scale-95'
+								>
+									8.7 - LICITACAOHISTORICO.JSON
+								</Button>
+								<Button
+									id='btn-gerar-publicacao-json'
+									className='hover:bg-gray-700 active:bg-green-600 active:scale-95'
+								>
+									8.15 - PUBLICACAO.JSON
+								</Button>
 							</div>
 						</CardFooter>
 					</Card>
