@@ -32,7 +32,7 @@ import { InputString } from '@/components/tce/input-string'
 import { InputDecimal } from '@/components/tce/input-decimal'
 import { InputInteger } from '@/components/tce/input-integer'
 import { TableItemLicitacao } from '@/components/tce/table-item-licitacao'
-import { gerarEbaixarJsonLicitacao, gerarEbaixarJsonPublicacao, montarObjetoPublicacao } from '@/lib/jsonGenerator';
+import { gerarEbaixarJsonLicitacao, gerarEbaixarJsonPublicacao, montarObjetoPublicacao, downloadJson } from '@/lib/jsonGenerator';
 
 // Tipos para os itens e formulário
 interface ItemType {
@@ -143,6 +143,39 @@ export default function Page() {
     const obj = montarObjetoPublicacao({ numProcessoLicitatorio, dtPublicacaoEdital, nomeVeiculoComunicacao });
 
     gerarEbaixarJsonPublicacao(obj);
+  }
+
+  // Função para gerar e baixar o JSON de LICITACAOHISTORICO
+  function handleGerarLicitacaoHistoricoJson() {
+    // Coleta dos valores dos campos
+    const codUnidadeOrcamentaria = (document.getElementById('cod-unidade-orcamentaria') as HTMLInputElement)?.value;
+    const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value;
+    const numEditalLicitacao = (document.getElementById('num-edital-licitacao') as HTMLInputElement)?.value;
+    // Data de publicação do edital (formato dd/MM/yyyy para YYYYmmdd)
+    let dtPublicacaoEdital = '';
+    const btnPubEdital = document.querySelector('#dt-publicacao-edital button');
+    if (btnPubEdital && btnPubEdital.textContent && btnPubEdital.textContent.match(/\d{2}\/\d{2}\/\d{4}/)) {
+      const [dia, mes, ano] = btnPubEdital.textContent.split('/');
+      dtPublicacaoEdital = `${ano}${mes}${dia}`;
+    }
+    const numDiarioOficial = (document.getElementById('num-diario-oficial') as HTMLInputElement)?.value;
+    // Data limite para envio das propostas (formato dd/MM/yyyy para YYYYmmdd)
+    let dtLimitePropostas = '';
+    const btnLimiteProp = document.querySelector('#dt-limite-propostas button');
+    if (btnLimiteProp && btnLimiteProp.textContent && btnLimiteProp.textContent.match(/\d{2}\/\d{2}\/\d{4}/)) {
+      const [dia, mes, ano] = btnLimiteProp.textContent.split('/');
+      dtLimitePropostas = `${ano}${mes}${dia}`;
+    }
+    // Monta o objeto conforme especificação
+    const obj = {
+      codUnidadeOrcamentaria: codUnidadeOrcamentaria ? Number(codUnidadeOrcamentaria) : null,
+      numProcessoLicitatorio: numProcessoLicitatorio || '',
+      numEditalLicitacao: numEditalLicitacao || '',
+      dtPublicacaoEdital: dtPublicacaoEdital || '',
+      numDiarioOficial: numDiarioOficial ? Number(numDiarioOficial) : null,
+      dtLimitePropostas: dtLimitePropostas || '',
+    };
+    downloadJson(obj, 'LICITACAOHISTORICO');
   }
 
   // Função para lidar com mudança dos campos do formulário dos itens
@@ -423,6 +456,7 @@ export default function Page() {
 								<Button
 									id='btn-gerar-licitacaohistorico-json'
 									className='hover:bg-gray-700 active:bg-green-600 active:scale-95'
+									onClick={handleGerarLicitacaoHistoricoJson}
 								>
 									8.7 - LICITACAOHISTORICO.JSON
 								</Button>
