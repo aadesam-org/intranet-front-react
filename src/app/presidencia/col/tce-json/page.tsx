@@ -32,7 +32,7 @@ import { InputString } from '@/components/tce/input-string'
 import { InputDecimal } from '@/components/tce/input-decimal'
 import { InputInteger } from '@/components/tce/input-integer'
 import { TableItemLicitacao } from '@/components/tce/table-item-licitacao'
-import { gerarEbaixarJsonLicitacao } from '@/lib/jsonGenerator';
+import { gerarEbaixarJsonLicitacao, gerarEbaixarJsonPublicacao, montarObjetoPublicacao } from '@/lib/jsonGenerator';
 
 // Tipos para os itens e formulário
 interface ItemType {
@@ -123,6 +123,26 @@ export default function Page() {
       idContratacaoPNCP: idContratacaoPNCP || '',
     };
     gerarEbaixarJsonLicitacao(obj);
+  }
+
+  // Função para gerar e baixar o JSON de PUBLICACAO
+  function handleGerarPublicacaoJson() {
+    // Pega o valor do processo licitatório
+    const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value || '';
+    // Pega a data de publicação do edital (formato dd/MM/yyyy)
+    let dtPublicacaoEdital = '';
+    const btn = document.querySelector('#dt-publicacao-edital button');
+    if (btn && btn.textContent && btn.textContent.match(/\d{2}\/\d{2}\/\d{4}/)) {
+      // Converte para formato YYYYmmdd
+      const [dia, mes, ano] = btn.textContent.split('/');
+      dtPublicacaoEdital = `${ano}${mes}${dia}`;
+    }
+    // Pega o nome do veículo de comunicação
+    const nomeVeiculoComunicacao = (document.getElementById('nome-veiculo-comunicacao') as HTMLInputElement)?.value || '';
+
+    const obj = montarObjetoPublicacao({ numProcessoLicitatorio, dtPublicacaoEdital, nomeVeiculoComunicacao });
+
+    gerarEbaixarJsonPublicacao(obj);
   }
 
   // Função para lidar com mudança dos campos do formulário dos itens
@@ -409,6 +429,7 @@ export default function Page() {
 								<Button
 									id='btn-gerar-publicacao-json'
 									className='hover:bg-gray-700 active:bg-green-600 active:scale-95'
+									onClick={handleGerarPublicacaoJson}
 								>
 									8.15 - PUBLICACAO.JSON
 								</Button>
