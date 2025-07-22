@@ -64,14 +64,14 @@ export function TableItemLicitacao({ itens, onEdit, onDelete }: TableItemLicitac
           ) : (
             itens.map((item, idx) => (
               <TableRow key={idx}>
-                <TableCell className="w-[10px] font-medium text-center">{item['num-sequencial-item']}</TableCell>
-                <TableCell className="w-[10px] text-center">{item['qt-item-solicitado']}</TableCell>
-                <TableCell className="w-[10px] text-center">{item['unidade-medida']}</TableCell>
-                <TableCell className="w-[50px] text-center">{item['cod-item-lote']}</TableCell>
-                <TableCell className="max-w-[50px] overflow-auto">{item['des-objeto-licitacao']}</TableCell>
-                <TableCell className="w-[10px] text-center">{statusLabels[item['status-item-licitacao']] || item['status-item-licitacao']}</TableCell>
-                <TableCell className="w-[10px] text-center">{item['dt-homologacao-item']}</TableCell>
-                <TableCell className="w-[10px] text-center">{item['dt-publicacao-homologacao']}</TableCell>
+                <TableCell id="row-num-sequencial-item" className="w-[10px] font-medium text-center">{item['num-sequencial-item']}</TableCell>
+                <TableCell id="row-qt-item-solicitado" className="w-[10px] text-center">{item['qt-item-solicitado']}</TableCell>
+                <TableCell id="row-unidade-medida" className="w-[10px] text-center">{item['unidade-medida']}</TableCell>
+                <TableCell id="row-cod-item-lote" className="w-[50px] text-center">{item['cod-item-lote']}</TableCell>
+                <TableCell id="row-des-objeto-licitacao" className="max-w-[50px] overflow-auto">{item['des-objeto-licitacao']}</TableCell>
+                <TableCell id="row-status" className="w-[10px] text-center">{statusLabels[item['status-item-licitacao']] || item['status-item-licitacao']}</TableCell>
+                <TableCell id="row-dt-homologacao-item" className="w-[10px] text-center">{item['dt-homologacao-item']}</TableCell>
+                <TableCell id="row-dt-publicacao-homologacao" className="w-[10px] text-center">{item['dt-publicacao-homologacao']}</TableCell>
                 <TableCell className="w-[10px] text-center">
                   <Button id="btn-editar-item" className="bg-blue-900 text-white hover:bg-blue-700 hover:text-lg active:bg-blue-600 active:scale-95 transition-all duration-150" onClick={() => onEdit(idx)}>
                     <Pencil />

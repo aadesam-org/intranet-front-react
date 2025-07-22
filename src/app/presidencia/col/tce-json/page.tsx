@@ -178,6 +178,51 @@ export default function Page() {
     downloadJson(obj, 'LICITACAOHISTORICO');
   }
 
+  // Função para gerar e baixar o JSON de ITENS DE LICITAÇÃO
+  function handleGerarItemLicitacaoJson() {
+    // Coleta dos valores do formulário principal
+    const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value || '';
+    const numEditalLicitacao = (document.getElementById('num-edital-licitacao') as HTMLInputElement)?.value || '';
+    // Data de publicação do edital (formato dd/MM/yyyy para YYYYmmdd)
+    let dtPublicacaoEdital = '';
+    const btnPubEdital = document.querySelector('#dt-publicacao-edital button');
+    if (btnPubEdital && btnPubEdital.textContent && btnPubEdital.textContent.match(/\d{2}\/\d{2}\/\d{4}/)) {
+      const [dia, mes, ano] = btnPubEdital.textContent.split('/');
+      dtPublicacaoEdital = `${ano}${mes}${dia}`;
+    }
+
+    // Mapeia os itens para o formato solicitado
+    const itensJson = itens.map((item) => ({
+      numProcessoLicitatorio,
+      numEditalLicitacao,
+      dtPublicacaoEdital,
+      numSequencialItem: Number(item['num-sequencial-item']),
+      desItemLicitacao: item['des-objeto-licitacao'],
+      qtItemLicitado: Number(item['qt-item-solicitado']),
+      dtHomologacaoItem: item['dt-homologacao-item'],
+      dtPublicacaoHomologacao: item['dt-publicacao-homologacao'],
+      unidadeMedida: item['unidade-medida'],
+      status: Number(item['status-item-licitacao']),
+      codItemLote: item['cod-item-lote'],
+    }));
+
+    // Função utilitária para gerar nome do arquivo
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const filename = `ITEMLICITACAO_${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}.json`;
+    const blob = new Blob([JSON.stringify(itensJson, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  }
+
   // Função para lidar com mudança dos campos do formulário dos itens
   function handleChange(e: { target: { id: string, value: string } }) {
     setForm({ ...form, [e.target.id]: e.target.value });
@@ -450,6 +495,7 @@ export default function Page() {
 								<Button
 									id='btn-gerar-itemlicitacao-json'
 									className='hover:bg-gray-700 active:bg-green-600 active:scale-95'
+									onClick={handleGerarItemLicitacaoJson}
 								>
 									8.6 - ITEMLICITACAO.JSON
 								</Button>
