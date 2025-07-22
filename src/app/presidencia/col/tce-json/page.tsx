@@ -25,7 +25,6 @@ import { ModalidadeLicitacao, NaturezaDoObjeto, NaturezaDoProcedimento, RegimeEx
 import { TextareaWithLabel } from '@/components/tce/textarea'
 import { RadioGroup, RadioGroupItem } from '@/components/shadcn/ui/radio-group'
 import { Label } from '@/components/shadcn/ui/label'
-import { CalendarYearMonth } from '@/components/shadcn/ui/select-date'
 import { Button } from '@/components/shadcn/ui/button'
 import { NumeroEditalLicitacao } from '@/components/tce/input-num-edital-licitacao'
 import { CalendarYearMonthDay } from '@/components/shadcn/ui/select-calendar'
@@ -33,6 +32,7 @@ import { InputString } from '@/components/tce/input-string'
 import { InputDecimal } from '@/components/tce/input-decimal'
 import { InputInteger } from '@/components/tce/input-integer'
 import { TableItemLicitacao } from '@/components/tce/table-item-licitacao'
+import { gerarEbaixarJsonLicitacao } from '@/lib/jsonGenerator';
 
 // Tipos para os itens e formulário
 interface ItemType {
@@ -61,12 +61,71 @@ const valoresIniciais: FormType = {
 };
 
 export default function Page() {
-  const [modalidade, setModalidade] = useState<string | undefined>(undefined);
+  const [modalidade, setModalidade] = useState<string>('');
   const [itens, setItens] = useState<ItemType[]>([]);
   const [form, setForm] = useState<FormType>(valoresIniciais);
   const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [valorEstimado, setValorEstimado] = useState<string>('');
 
-  // Função para lidar com mudança dos campos do formulário
+  const [tipoLicitacao, setCodTipoLicitacao] = useState<string>('');
+  const [naturezaObjeto, setCodNaturezaObjeto] = useState<string>('');
+  const [codNaturezaProcedimento, setCodNaturezaProcedimento] = useState<string>('');
+  const [codRegimeObra, setCodRegimeObra] = useState<string>('');
+  const [tpItemLote, setTpItemLote] = useState<string>('L');
+  const [competencia, setCompetencia] = useState<string>('');
+
+  // Função para pegar valor do CalendarYearMonth (competência)
+  function getCompetenciaValue() {
+    const btn = document.querySelector('#dt-competencia button');
+    if (btn && btn.textContent && btn.textContent.match(/\d{2}\/\d{4}/)) {
+      const [mes, ano] = btn.textContent.split('/');
+      return ano + mes.padStart(2, '0');
+    }
+    return undefined;
+  }
+
+  // Função para pegar valor do CalendarYearMonthDay (datas)
+  function getDateValue(id: string) {
+    const btn = document.querySelector(`#${id} button`);
+    if (btn && btn.textContent && btn.textContent.match(/\d{2}\/\d{2}\/\d{4}/)) {
+      // Retorna no formato dd/MM/yyyy
+      return btn.textContent;
+    }
+    return undefined;
+  }
+
+  // Handler do botão de gerar JSON
+  function handleGerarLicitacaoJson() {
+    // Coleta dos valores
+    const codUnidadeOrcamentaria = (document.getElementById('cod-unidade-orcamentaria') as HTMLInputElement)?.value;
+    const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value;
+    const codModalidadeLicitacao = modalidade;
+		const codTipoLicitacao = tipoLicitacao;
+    const codNaturezaObjeto = naturezaObjeto;
+    const desObjetoLicitacao = (document.getElementById('des-objeto-licitacao') as HTMLTextAreaElement)?.value;
+    const vlTotalPrevisto = valorEstimado?.replace(/[^\d.,]/g, '').replace(',', '.');
+    const competenciaValue = getCompetenciaValue();
+    const idContratacaoPNCP = (document.getElementById('id-contratacao-pncp') as HTMLInputElement)?.value;
+
+    // Monta o objeto
+    const obj = {
+      codUnidadeOrcamentaria: codUnidadeOrcamentaria ? Number(codUnidadeOrcamentaria) : null,
+      numProcessoLicitatorio: numProcessoLicitatorio || '',
+      codModalidadeLicitacao: codModalidadeLicitacao ? Number(codModalidadeLicitacao) : null,
+      codTipoLicitacao: (codTipoLicitacao && Number(codModalidadeLicitacao) !== 4) ? Number(codTipoLicitacao) : null,
+      codNaturezaObjeto: (codNaturezaObjeto && Number(codModalidadeLicitacao) !== 4) ? Number(codNaturezaObjeto) : null,
+      codNaturezaProcedimento: codNaturezaProcedimento ? Number(codNaturezaProcedimento) : null,
+      desObjetoLicitacao: desObjetoLicitacao || '',
+      codRegimeObra: codRegimeObra ? Number(codRegimeObra) : null,
+      vlTotalPrevisto: vlTotalPrevisto ? Number(vlTotalPrevisto) : null,
+      tpItemLote: tpItemLote || '',
+      competencia: competenciaValue ? Number(competenciaValue) : null,
+      idContratacaoPNCP: idContratacaoPNCP || '',
+    };
+    gerarEbaixarJsonLicitacao(obj);
+  }
+
+  // Função para lidar com mudança dos campos do formulário dos itens
   function handleChange(e: { target: { id: string, value: string } }) {
     setForm({ ...form, [e.target.id]: e.target.value });
     // Log para depuração
@@ -96,9 +155,13 @@ export default function Page() {
     setEditIndex(index);
   }
 
-  // Excluir item
+  // Handler para deletar item
   function handleDelete(index: number) {
-    setItens(itens.filter((_, i) => i !== index));
+    const novosItens = itens.filter((_, i) => i !== index);
+    setItens(novosItens);
+    if (editIndex === index) {
+      setEditIndex(null);
+    }
   }
 
   return (
@@ -155,19 +218,19 @@ export default function Page() {
 									<ModalidadeLicitacao value={modalidade} onChange={setModalidade} />
                 </div>
 								<div className="grid gap-3 w-full">
-									<NaturezaDoObjeto disabled={modalidade === "4" } />
+									<NaturezaDoObjeto value={naturezaObjeto} onChange={setCodNaturezaObjeto} disabled={modalidade === "4"} />
                 </div>
 								<div className="grid gap-3 w-full">
-									<NaturezaDoProcedimento />
+									<NaturezaDoProcedimento value={codNaturezaProcedimento} onChange={setCodNaturezaProcedimento} />
 								</div>
 								<div className="grid gap-3 w-full">
-									<RegimeExecucaoObra />
+									<RegimeExecucaoObra value={codRegimeObra} onChange={setCodRegimeObra} />
 								</div>
 								<div className="grid gap-3 w-full">
-									<CalendarYearMonth label="Competência" id="dt-competencia" />
+									<CalendarYearMonthDay label="Competência" id="dt-competencia" onChange={setCompetencia}/>
 								</div>
 								<div className="grid gap-3 w-full">
-									<CalendarYearMonthDay label="Limite para Envio da Proposta" id="dt-limite-propostas"/>
+									<CalendarYearMonthDay label="Limite para Envio da Proposta" id="dt-limite-propostas" />
 								</div>
 								<div className="grid gap-3 w-full">
 									<InputNumericWithLabel id="num-diario-oficial" label="Número do Diário Oficial" placeholder="35454" maxLength={6} required />
@@ -185,22 +248,16 @@ export default function Page() {
 								</div>
 								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
 									<div className="grid gap-3 w-full">
-										<InputCurrencyBRL
-											id="valor-estimado"
-											title="Total da Despesa Prevista"
-											onValueChange={(valorDecimal) => {
-												console.log(valorDecimal);
-											}}
-										/>
+										<InputCurrencyBRL id="valor-estimado" title="Total da Despesa Prevista" value={valorEstimado} onValueChange={setValorEstimado} />
 									</div>
 									<div className="grid gap-3 w-full">
-										<InputNumberPNPC />
+										<InputNumberPNPC id='id-contratacao-pncp' />
 									</div>
 									<div className="grid gap-3 w-full">
-										<TipoDeLicitacao disabled={modalidade === "4" } />
+										<TipoDeLicitacao value={tipoLicitacao} onChange={setCodTipoLicitacao} disabled={modalidade === "4"} />
 									</div>
 									<div className="grid gap-3 w-full justify-center">
-											<RadioGroup id="tp-item-lote" defaultValue="L">
+											<RadioGroup id="tp-item-lote" value={tpItemLote} onValueChange={setTpItemLote}>
 												<div className="flex items-center space-x-2">
 													<RadioGroupItem value="L" id="tp-lote" defaultChecked />
 													<Label htmlFor="tp-lote">Lote</Label>
@@ -333,6 +390,7 @@ export default function Page() {
 								<Button
 									id='btn-gerar-licitacao-json'
 									className='hover:bg-gray-700 active:bg-green-600 active:scale-95'
+									onClick={handleGerarLicitacaoJson}
 								>
 									8.5 - LICITACAO.JSON
 								</Button>
