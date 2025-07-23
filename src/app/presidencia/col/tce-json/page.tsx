@@ -84,19 +84,8 @@ export default function Page() {
     return undefined;
   }
 
-  // Função para pegar valor do CalendarYearMonthDay (datas)
-  function getDateValue(id: string) {
-    const btn = document.querySelector(`#${id} button`);
-    if (btn && btn.textContent && btn.textContent.match(/\d{2}\/\d{2}\/\d{4}/)) {
-      // Retorna no formato dd/MM/yyyy
-      return btn.textContent;
-    }
-    return undefined;
-  }
-
-  // Handler do botão de gerar JSON
+  // Handler do botão de gerar LICITACAO.JSON
   function handleGerarLicitacaoJson() {
-    // Coleta dos valores
     const codUnidadeOrcamentaria = (document.getElementById('cod-unidade-orcamentaria') as HTMLInputElement)?.value;
     const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value;
     const codModalidadeLicitacao = modalidade;
@@ -125,11 +114,9 @@ export default function Page() {
     gerarEbaixarJsonLicitacao(obj);
   }
 
-  // Função para gerar e baixar o JSON de PUBLICACAO
+  // Função para gerar e baixar o PUBLICACAO.JSON
   function handleGerarPublicacaoJson() {
-    // Pega o valor do processo licitatório
     const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value || '';
-    // Pega a data de publicação do edital (formato dd/MM/yyyy)
     let dtPublicacaoEdital = '';
     const btn = document.querySelector('#dt-publicacao-edital button');
     if (btn && btn.textContent && btn.textContent.match(/\d{2}\/\d{2}\/\d{4}/)) {
@@ -137,21 +124,16 @@ export default function Page() {
       const [dia, mes, ano] = btn.textContent.split('/');
       dtPublicacaoEdital = `${ano}${mes}${dia}`;
     }
-    // Pega o nome do veículo de comunicação
     const nomeVeiculoComunicacao = (document.getElementById('nome-veiculo-comunicacao') as HTMLInputElement)?.value || '';
-
     const obj = montarObjetoPublicacao({ numProcessoLicitatorio, dtPublicacaoEdital, nomeVeiculoComunicacao });
-
     gerarEbaixarJsonPublicacao(obj);
   }
 
-  // Função para gerar e baixar o JSON de LICITACAOHISTORICO
+  // Função para gerar e baixar de LICITACAOHISTORICO.JSON
   function handleGerarLicitacaoHistoricoJson() {
-    // Coleta dos valores dos campos
     const codUnidadeOrcamentaria = (document.getElementById('cod-unidade-orcamentaria') as HTMLInputElement)?.value;
     const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value;
     const numEditalLicitacao = (document.getElementById('num-edital-licitacao') as HTMLInputElement)?.value;
-    // Data de publicação do edital (formato dd/MM/yyyy para YYYYmmdd)
     let dtPublicacaoEdital = '';
     const btnPubEdital = document.querySelector('#dt-publicacao-edital button');
     if (btnPubEdital && btnPubEdital.textContent && btnPubEdital.textContent.match(/\d{2}\/\d{2}\/\d{4}/)) {
@@ -159,14 +141,13 @@ export default function Page() {
       dtPublicacaoEdital = `${ano}${mes}${dia}`;
     }
     const numDiarioOficial = (document.getElementById('num-diario-oficial') as HTMLInputElement)?.value;
-    // Data limite para envio das propostas (formato dd/MM/yyyy para YYYYmmdd)
     let dtLimitePropostas = '';
     const btnLimiteProp = document.querySelector('#dt-limite-propostas button');
     if (btnLimiteProp && btnLimiteProp.textContent && btnLimiteProp.textContent.match(/\d{2}\/\d{2}\/\d{4}/)) {
       const [dia, mes, ano] = btnLimiteProp.textContent.split('/');
       dtLimitePropostas = `${ano}${mes}${dia}`;
     }
-    // Monta o objeto conforme especificação
+
     const obj = {
       codUnidadeOrcamentaria: codUnidadeOrcamentaria ? Number(codUnidadeOrcamentaria) : null,
       numProcessoLicitatorio: numProcessoLicitatorio || '',
@@ -178,29 +159,31 @@ export default function Page() {
     downloadJson(obj, 'LICITACAOHISTORICO');
   }
 
-  // Função para gerar e baixar o JSON de ITENS DE LICITAÇÃO
+	const formatDateToYYYYMMDD = (date: string) => {
+		if (!date.includes('-')) {
+			return date;
+		}
+		const [year, month, day] = date.split('-');
+		return `${year}${month}${day}`;
+	}
+
+  // Função para gerar e baixar o ITEM.LICITACAO.JSON
   function handleGerarItemLicitacaoJson() {
-    // Coleta dos valores do formulário principal
+
     const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value || '';
     const numEditalLicitacao = (document.getElementById('num-edital-licitacao') as HTMLInputElement)?.value || '';
-    // Data de publicação do edital (formato dd/MM/yyyy para YYYYmmdd)
-    let dtPublicacaoEdital = '';
-    const btnPubEdital = document.querySelector('#dt-publicacao-edital button');
-    if (btnPubEdital && btnPubEdital.textContent && btnPubEdital.textContent.match(/\d{2}\/\d{2}\/\d{4}/)) {
-      const [dia, mes, ano] = btnPubEdital.textContent.split('/');
-      dtPublicacaoEdital = `${ano}${mes}${dia}`;
-    }
+    const dtPublicacaoEdital = formatDateToYYYYMMDD((document.getElementById('dt-publicacao-edital') as HTMLInputElement)?.value || '');
 
     // Mapeia os itens para o formato solicitado
     const itensJson = itens.map((item) => ({
       numProcessoLicitatorio,
       numEditalLicitacao,
-      dtPublicacaoEdital,
+      dtPublicacaoEdital: dtPublicacaoEdital,
       numSequencialItem: Number(item['num-sequencial-item']),
       desItemLicitacao: item['des-objeto-licitacao'],
       qtItemLicitado: Number(item['qt-item-solicitado']),
-      dtHomologacaoItem: item['dt-homologacao-item'],
-      dtPublicacaoHomologacao: item['dt-publicacao-homologacao'],
+      dtHomologacaoItem: formatDateToYYYYMMDD(item['dt-homologacao-item']),
+      dtPublicacaoHomologacao: formatDateToYYYYMMDD(item['dt-publicacao-homologacao']),
       unidadeMedida: item['unidade-medida'],
       status: Number(item['status-item-licitacao']),
       codItemLote: item['cod-item-lote'],
