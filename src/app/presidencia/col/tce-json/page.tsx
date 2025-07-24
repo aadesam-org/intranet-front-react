@@ -60,43 +60,46 @@ const valoresIniciais: FormType = {
   'dt-publicacao-homologacao': '',
 };
 
+const formatDateToYYYYMMDD = (date: string) => {
+  if (!date.includes('-')) {
+    return date;
+  }
+  const [year, month, day] = date.split('-');
+  return `${year}${month}${day}`;
+}
+
 export default function Page() {
   const [modalidade, setModalidade] = useState<string>('');
   const [itens, setItens] = useState<ItemType[]>([]);
   const [form, setForm] = useState<FormType>(valoresIniciais);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [valorEstimado, setValorEstimado] = useState<string>('');
-
   const [tipoLicitacao, setCodTipoLicitacao] = useState<string>('');
   const [naturezaObjeto, setCodNaturezaObjeto] = useState<string>('');
   const [codNaturezaProcedimento, setCodNaturezaProcedimento] = useState<string>('');
   const [codRegimeObra, setCodRegimeObra] = useState<string>('');
   const [tpItemLote, setTpItemLote] = useState<string>('L');
   const [competencia, setCompetencia] = useState<string>('');
+  const [dtPublicacaoEdital, setDtPublicacaoEdital] = useState<string>('');
+  const [dtLimitePropostas, setDtLimitePropostas] = useState<string>('');
 
-  // Função para pegar valor do CalendarYearMonth (competência)
-  function getCompetenciaValue() {
-    const btn = document.querySelector('#dt-competencia button');
-    if (btn && btn.textContent && btn.textContent.match(/\d{2}\/\d{4}/)) {
-      const [mes, ano] = btn.textContent.split('/');
-      return ano + mes.padStart(2, '0');
-    }
-    return undefined;
-  }
+  const codUnidadeOrcamentaria = (document.getElementById('cod-unidade-orcamentaria') as HTMLInputElement)?.value;
+  const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value;
+  const codModalidadeLicitacao = modalidade;
+  const codTipoLicitacao = tipoLicitacao;
+  const codNaturezaObjeto = naturezaObjeto;
+  const desObjetoLicitacao = (document.getElementById('des-objeto-licitacao') as HTMLTextAreaElement)?.value;
+  const vlTotalPrevisto = valorEstimado?.replace(/[^\d.,]/g, '').replace(',', '.');
+  const idContratacaoPNCP = (document.getElementById('id-contratacao-pncp') as HTMLInputElement)?.value;
+
+  const nomeVeiculoComunicacao = (document.getElementById('nome-veiculo-comunicacao') as HTMLInputElement)?.value || '';
+
+  const numEditalLicitacao = (document.getElementById('num-edital-licitacao') as HTMLInputElement)?.value;
+  const numDiarioOficial = (document.getElementById('num-diario-oficial') as HTMLInputElement)?.value;
 
   // Handler do botão de gerar LICITACAO.JSON
   function handleGerarLicitacaoJson() {
-    const codUnidadeOrcamentaria = (document.getElementById('cod-unidade-orcamentaria') as HTMLInputElement)?.value;
-    const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value;
-    const codModalidadeLicitacao = modalidade;
-		const codTipoLicitacao = tipoLicitacao;
-    const codNaturezaObjeto = naturezaObjeto;
-    const desObjetoLicitacao = (document.getElementById('des-objeto-licitacao') as HTMLTextAreaElement)?.value;
-    const vlTotalPrevisto = valorEstimado?.replace(/[^\d.,]/g, '').replace(',', '.');
-    const competenciaValue = getCompetenciaValue();
-    const idContratacaoPNCP = (document.getElementById('id-contratacao-pncp') as HTMLInputElement)?.value;
 
-    // Monta o objeto
     const obj = {
       codUnidadeOrcamentaria: codUnidadeOrcamentaria ? Number(codUnidadeOrcamentaria) : null,
       numProcessoLicitatorio: numProcessoLicitatorio || '',
@@ -108,7 +111,7 @@ export default function Page() {
       codRegimeObra: codRegimeObra ? Number(codRegimeObra) : null,
       vlTotalPrevisto: vlTotalPrevisto ? Number(vlTotalPrevisto) : null,
       tpItemLote: tpItemLote || '',
-      competencia: competenciaValue ? Number(competenciaValue) : null,
+      competencia: formatDateToYYYYMMDD(competencia) || '',
       idContratacaoPNCP: idContratacaoPNCP || '',
     };
     gerarEbaixarJsonLicitacao(obj);
@@ -116,74 +119,43 @@ export default function Page() {
 
   // Função para gerar e baixar o PUBLICACAO.JSON
   function handleGerarPublicacaoJson() {
-    const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value || '';
-    let dtPublicacaoEdital = '';
-    const btn = document.querySelector('#dt-publicacao-edital button');
-    if (btn && btn.textContent && btn.textContent.match(/\d{2}\/\d{2}\/\d{4}/)) {
-      // Converte para formato YYYYmmdd
-      const [dia, mes, ano] = btn.textContent.split('/');
-      dtPublicacaoEdital = `${ano}${mes}${dia}`;
-    }
-    const nomeVeiculoComunicacao = (document.getElementById('nome-veiculo-comunicacao') as HTMLInputElement)?.value || '';
-    const obj = montarObjetoPublicacao({ numProcessoLicitatorio, dtPublicacaoEdital, nomeVeiculoComunicacao });
+    const obj = montarObjetoPublicacao({
+      numProcessoLicitatorio,
+      dtPublicacaoEdital: formatDateToYYYYMMDD(dtPublicacaoEdital),
+      nomeVeiculoComunicacao
+    });
     gerarEbaixarJsonPublicacao(obj);
   }
 
   // Função para gerar e baixar de LICITACAOHISTORICO.JSON
   function handleGerarLicitacaoHistoricoJson() {
-    const codUnidadeOrcamentaria = (document.getElementById('cod-unidade-orcamentaria') as HTMLInputElement)?.value;
-    const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value;
-    const numEditalLicitacao = (document.getElementById('num-edital-licitacao') as HTMLInputElement)?.value;
-    let dtPublicacaoEdital = '';
-    const btnPubEdital = document.querySelector('#dt-publicacao-edital button');
-    if (btnPubEdital && btnPubEdital.textContent && btnPubEdital.textContent.match(/\d{2}\/\d{2}\/\d{4}/)) {
-      const [dia, mes, ano] = btnPubEdital.textContent.split('/');
-      dtPublicacaoEdital = `${ano}${mes}${dia}`;
-    }
-    const numDiarioOficial = (document.getElementById('num-diario-oficial') as HTMLInputElement)?.value;
-    let dtLimitePropostas = '';
-    const btnLimiteProp = document.querySelector('#dt-limite-propostas button');
-    if (btnLimiteProp && btnLimiteProp.textContent && btnLimiteProp.textContent.match(/\d{2}\/\d{2}\/\d{4}/)) {
-      const [dia, mes, ano] = btnLimiteProp.textContent.split('/');
-      dtLimitePropostas = `${ano}${mes}${dia}`;
-    }
 
     const obj = {
       codUnidadeOrcamentaria: codUnidadeOrcamentaria ? Number(codUnidadeOrcamentaria) : null,
       numProcessoLicitatorio: numProcessoLicitatorio || '',
       numEditalLicitacao: numEditalLicitacao || '',
-      dtPublicacaoEdital: dtPublicacaoEdital || '',
+      dtPublicacaoEdital: formatDateToYYYYMMDD(dtPublicacaoEdital) || '',
       numDiarioOficial: numDiarioOficial ? Number(numDiarioOficial) : null,
-      dtLimitePropostas: dtLimitePropostas || '',
+      dtLimitePropostas: formatDateToYYYYMMDD(dtLimitePropostas) || '',
     };
     downloadJson(obj, 'LICITACAOHISTORICO');
   }
 
-	const formatDateToYYYYMMDD = (date: string) => {
-		if (!date.includes('-')) {
-			return date;
-		}
-		const [year, month, day] = date.split('-');
-		return `${year}${month}${day}`;
-	}
-
-  // Função para gerar e baixar o ITEM.LICITACAO.JSON
+  // Função para gerar e baixar o ITEMLICITACAO.JSON
   function handleGerarItemLicitacaoJson() {
 
-    const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value || '';
-    const numEditalLicitacao = (document.getElementById('num-edital-licitacao') as HTMLInputElement)?.value || '';
-    const dtPublicacaoEdital = formatDateToYYYYMMDD((document.getElementById('dt-publicacao-edital') as HTMLInputElement)?.value || '');
+    const dtPublicacaoEditalFormatada = formatDateToYYYYMMDD(dtPublicacaoEdital);
 
     // Mapeia os itens para o formato solicitado
     const itensJson = itens.map((item) => ({
       numProcessoLicitatorio,
       numEditalLicitacao,
-      dtPublicacaoEdital: dtPublicacaoEdital,
+      dtPublicacaoEdital: dtPublicacaoEditalFormatada,
       numSequencialItem: Number(item['num-sequencial-item']),
       desItemLicitacao: item['des-objeto-licitacao'],
       qtItemLicitado: Number(item['qt-item-solicitado']),
-      dtHomologacaoItem: formatDateToYYYYMMDD(item['dt-homologacao-item']),
-      dtPublicacaoHomologacao: formatDateToYYYYMMDD(item['dt-publicacao-homologacao']),
+      dtHomologacaoItem: formatDateToYYYYMMDD(item['dt-homologacao-item']) || '',
+      dtPublicacaoHomologacao: formatDateToYYYYMMDD(item['dt-publicacao-homologacao']) || '',
       unidadeMedida: item['unidade-medida'],
       status: Number(item['status-item-licitacao']),
       codItemLote: item['cod-item-lote'],
@@ -293,7 +265,7 @@ export default function Page() {
 									<NumeroEditalLicitacao id="num-edital-licitacao" label="Número do Edital de Licitação" required />
 								</div>
 								<div className="grid gap-3 w-full">
-									<CalendarYearMonthDay label="Data de Publicação do Edital" id="dt-publicacao-edital" required className="w-full" />
+									<CalendarYearMonthDay label="Data de Publicação do Edital" id="dt-publicacao-edital" value={dtPublicacaoEdital} onChange={e => setDtPublicacaoEdital(e.target.value)} required className="w-full" />
 								</div>
 								<div className="grid gap-3 w-full">
 									<ModalidadeLicitacao value={modalidade} onChange={setModalidade} />
@@ -308,10 +280,10 @@ export default function Page() {
 									<RegimeExecucaoObra value={codRegimeObra} onChange={setCodRegimeObra} />
 								</div>
 								<div className="grid gap-3 w-full">
-									<CalendarYearMonthDay label="Competência" id="dt-competencia" onChange={setCompetencia}/>
+									<CalendarYearMonthDay label="Competência" id="dt-competencia" value={competencia} onChange={e => setCompetencia(e.target.value)}/>
 								</div>
 								<div className="grid gap-3 w-full">
-									<CalendarYearMonthDay label="Limite para Envio da Proposta" id="dt-limite-propostas" />
+									<CalendarYearMonthDay label="Limite para Envio da Proposta" id="dt-limite-propostas" value={dtLimitePropostas} onChange={e => setDtLimitePropostas(e.target.value)} />
 								</div>
 								<div className="grid gap-3 w-full">
 									<InputNumericWithLabel id="num-diario-oficial" label="Número do Diário Oficial" placeholder="35454" maxLength={6} required />

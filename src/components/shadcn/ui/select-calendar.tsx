@@ -20,7 +20,6 @@ export function CalendarYearMonthDay({ label, id, value, onChange, ...props }: {
 }) {
 
   const [open, setOpen] = React.useState(false)
-  // Se value for passado, componente controlado; senão, usa estado interno
   const [date, setDate] = React.useState<Date | undefined>(undefined)
   const isControlled = value !== undefined && value !== '';
 
