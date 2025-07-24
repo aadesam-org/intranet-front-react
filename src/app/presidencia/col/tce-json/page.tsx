@@ -32,9 +32,7 @@ import { InputString } from '@/components/tce/input-string'
 import { InputDecimal } from '@/components/tce/input-decimal'
 import { InputInteger } from '@/components/tce/input-integer'
 import { TableItemLicitacao } from '@/components/tce/table-item-licitacao'
-import { gerarEbaixarJsonLicitacao, gerarEbaixarJsonPublicacao, montarObjetoPublicacao, downloadJson } from '@/lib/jsonGenerator';
 
-// Tipos para os itens e formulário
 interface ItemType {
   'num-sequencial-item': string;
   'qt-item-solicitado': string;
@@ -46,7 +44,6 @@ interface ItemType {
   'dt-publicacao-homologacao': string;
 }
 
-// Pode ser igual ao ItemType
 type FormType = ItemType;
 
 const valoresIniciais: FormType = {
@@ -60,47 +57,58 @@ const valoresIniciais: FormType = {
   'dt-publicacao-homologacao': '',
 };
 
-const formatDateToYYYYMMDD = (date: string) => {
-  if (!date.includes('-')) {
-    return date;
-  }
-  const [year, month, day] = date.split('-');
-  return `${year}${month}${day}`;
+function downloadJson(dados: any, nomeBase: string) {
+  const now = new Date();
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  const filename = `${nomeBase}_${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}.json`;
+  const blob = new Blob([JSON.stringify([dados], null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
 }
 
 export default function Page() {
-  const [modalidade, setModalidade] = useState<string>('');
+
+  const [codUnidadeOrcamentaria, setCodUnidadeOrcamentaria] = useState('99001');
+  const [numProcessoLicitatorio, setNumProcessoLicitatorio] = useState('/AADESAM');
+  const [codModalidadeLicitacao, setCodModalidadeLicitacao] = useState<string>('');
+  const [desObjetoLicitacao, setDesObjetoLicitacao] = useState<string>('');
+  const [idContratacaoPNCP, setIdContratacaoPNCP] = useState<string>('');
   const [itens, setItens] = useState<ItemType[]>([]);
   const [form, setForm] = useState<FormType>(valoresIniciais);
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [valorEstimado, setValorEstimado] = useState<string>('');
-  const [tipoLicitacao, setCodTipoLicitacao] = useState<string>('');
-  const [naturezaObjeto, setCodNaturezaObjeto] = useState<string>('');
+  const [vlTotalPrevisto, setVlTotalPrevisto] = useState<string>('')
+  const [codTipoLicitacao, setCodTipoLicitacao] = useState<string>('');
+  const [codNaturezaObjeto, setCodNaturezaObjeto] = useState<string>('');
   const [codNaturezaProcedimento, setCodNaturezaProcedimento] = useState<string>('');
   const [codRegimeObra, setCodRegimeObra] = useState<string>('');
   const [tpItemLote, setTpItemLote] = useState<string>('L');
   const [competencia, setCompetencia] = useState<string>('');
   const [dtPublicacaoEdital, setDtPublicacaoEdital] = useState<string>('');
   const [dtLimitePropostas, setDtLimitePropostas] = useState<string>('');
+  const [nomeVeiculoComunicacao, setNomeVeiculoComunicacao] = useState<string>('Diário Oficial do Estado do Amazonas');
+  const [numEditalLicitacao, setNumEditalLicitacao] = useState<string>('');
+  const [numDiarioOficial, setNumDiarioOficial] = useState<string>('');
 
-  const codUnidadeOrcamentaria = (document.getElementById('cod-unidade-orcamentaria') as HTMLInputElement)?.value;
-  const numProcessoLicitatorio = (document.getElementById('num-processo-licitatorio') as HTMLInputElement)?.value;
-  const codModalidadeLicitacao = modalidade;
-  const codTipoLicitacao = tipoLicitacao;
-  const codNaturezaObjeto = naturezaObjeto;
-  const desObjetoLicitacao = (document.getElementById('des-objeto-licitacao') as HTMLTextAreaElement)?.value;
-  const vlTotalPrevisto = valorEstimado?.replace(/[^\d.,]/g, '').replace(',', '.');
-  const idContratacaoPNCP = (document.getElementById('id-contratacao-pncp') as HTMLInputElement)?.value;
+  const formatDateToYYYYMMDD = (date: string) => {
+		if (!date.includes('-')) {
+			return date;
+		}
+		const [year, month, day] = date.split('-');
+		return `${year}${month}${day}`;
+	}
 
-  const nomeVeiculoComunicacao = (document.getElementById('nome-veiculo-comunicacao') as HTMLInputElement)?.value || '';
-
-  const numEditalLicitacao = (document.getElementById('num-edital-licitacao') as HTMLInputElement)?.value;
-  const numDiarioOficial = (document.getElementById('num-diario-oficial') as HTMLInputElement)?.value;
-
-  // Handler do botão de gerar LICITACAO.JSON
-  function handleGerarLicitacaoJson() {
-
-    const obj = {
+  function generateAndDownloadLicitacaoJson() {
+    const licitacaoPayload = {
       codUnidadeOrcamentaria: codUnidadeOrcamentaria ? Number(codUnidadeOrcamentaria) : null,
       numProcessoLicitatorio: numProcessoLicitatorio || '',
       codModalidadeLicitacao: codModalidadeLicitacao ? Number(codModalidadeLicitacao) : null,
@@ -109,28 +117,27 @@ export default function Page() {
       codNaturezaProcedimento: codNaturezaProcedimento ? Number(codNaturezaProcedimento) : null,
       desObjetoLicitacao: desObjetoLicitacao || '',
       codRegimeObra: codRegimeObra ? Number(codRegimeObra) : null,
-      vlTotalPrevisto: vlTotalPrevisto ? Number(vlTotalPrevisto) : null,
+      vlTotalPrevisto: vlTotalPrevisto.replace(/[^\d.,]/g, '').replace(',', '.') ? Number(vlTotalPrevisto) : null,
       tpItemLote: tpItemLote || '',
       competencia: formatDateToYYYYMMDD(competencia) || '',
       idContratacaoPNCP: idContratacaoPNCP || '',
     };
-    gerarEbaixarJsonLicitacao(obj);
+    downloadJson(licitacaoPayload, 'LICITACAO');
   }
 
-  // Função para gerar e baixar o PUBLICACAO.JSON
-  function handleGerarPublicacaoJson() {
-    const obj = montarObjetoPublicacao({
+  function generateAndDownloadPublicacaoJson() {
+
+    const publicacaoPayload = {
       numProcessoLicitatorio,
       dtPublicacaoEdital: formatDateToYYYYMMDD(dtPublicacaoEdital),
       nomeVeiculoComunicacao
-    });
-    gerarEbaixarJsonPublicacao(obj);
+    };
+    downloadJson(publicacaoPayload, 'PUBLICACAO');
   }
 
-  // Função para gerar e baixar de LICITACAOHISTORICO.JSON
-  function handleGerarLicitacaoHistoricoJson() {
+  function generateAndDownloadLicitacaoHistoricoJson() {
 
-    const obj = {
+    const licitacaoHistoricoPayload = {
       codUnidadeOrcamentaria: codUnidadeOrcamentaria ? Number(codUnidadeOrcamentaria) : null,
       numProcessoLicitatorio: numProcessoLicitatorio || '',
       numEditalLicitacao: numEditalLicitacao || '',
@@ -138,19 +145,15 @@ export default function Page() {
       numDiarioOficial: numDiarioOficial ? Number(numDiarioOficial) : null,
       dtLimitePropostas: formatDateToYYYYMMDD(dtLimitePropostas) || '',
     };
-    downloadJson(obj, 'LICITACAOHISTORICO');
+    downloadJson(licitacaoHistoricoPayload, 'LICITACAOHISTORICO');
   }
 
-  // Função para gerar e baixar o ITEMLICITACAO.JSON
-  function handleGerarItemLicitacaoJson() {
+  function generateAndDownloadItemLicitacaoJson() {
 
-    const dtPublicacaoEditalFormatada = formatDateToYYYYMMDD(dtPublicacaoEdital);
-
-    // Mapeia os itens para o formato solicitado
-    const itensJson = itens.map((item) => ({
+    const itemsLicitacaoPayload = itens.map((item) => ({
       numProcessoLicitatorio,
       numEditalLicitacao,
-      dtPublicacaoEdital: dtPublicacaoEditalFormatada,
+      dtPublicacaoEdital: formatDateToYYYYMMDD(dtPublicacaoEdital) || '',
       numSequencialItem: Number(item['num-sequencial-item']),
       desItemLicitacao: item['des-objeto-licitacao'],
       qtItemLicitado: Number(item['qt-item-solicitado']),
@@ -160,28 +163,12 @@ export default function Page() {
       status: Number(item['status-item-licitacao']),
       codItemLote: item['cod-item-lote'],
     }));
-
-    // Função utilitária para gerar nome do arquivo
-    const now = new Date();
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    const filename = `ITEMLICITACAO_${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}.json`;
-    const blob = new Blob([JSON.stringify(itensJson, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 100);
+    downloadJson(itemsLicitacaoPayload, 'ITEMLICITACAO');
   }
 
   // Função para lidar com mudança dos campos do formulário dos itens
   function handleChange(e: { target: { id: string, value: string } }) {
     setForm({ ...form, [e.target.id]: e.target.value });
-    // Log para depuração
     if (e.target.id === 'dt-homologacao-item' || e.target.id === 'dt-publicacao-homologacao') {
       console.log('Data alterada:', e.target.id, e.target.value);
     }
@@ -199,7 +186,7 @@ export default function Page() {
       // Adicionar
       setItens([...itens, form]);
     }
-    setForm(valoresIniciais); // Limpa o formulário
+    setForm(valoresIniciais);
   }
 
   // Preencher formulário para edição
@@ -256,40 +243,98 @@ export default function Page() {
 						<CardContent>
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="grid gap-3 w-full">
-									<InputNumericWithLabel id="cod-unidade-orcamentaria" label="Código da Unidade Orçamentária" placeholder="99001" defaultValue={99001} maxLength={6} required />
+									<InputNumericWithLabel label="Código da Unidade Orçamentária"
+                    id="cod-unidade-orcamentaria"
+                    value={codUnidadeOrcamentaria}
+                    onChange={(e) => setCodUnidadeOrcamentaria(e.target.value)}
+                    placeholder="99001"
+                    maxLength={6}
+                    required
+                  />
                 </div>
                 <div className="grid gap-3 w-full">
-									<InputNumeroProcessoLicitatorio required />
+									<InputNumeroProcessoLicitatorio
+                    id="num-processo-licitatorio"
+                    value={numProcessoLicitatorio}
+                    onChange={(e) => setNumProcessoLicitatorio(e.target.value)}
+                    required
+                  />
                 </div>
 								<div className="grid gap-3 w-full">
-									<NumeroEditalLicitacao id="num-edital-licitacao" label="Número do Edital de Licitação" required />
+									<NumeroEditalLicitacao label="Número do Edital de Licitação"
+                    id="num-edital-licitacao"
+                    value={numEditalLicitacao}
+                    onChange={(e) => setNumEditalLicitacao(e.target.value)}
+                    required />
 								</div>
 								<div className="grid gap-3 w-full">
-									<CalendarYearMonthDay label="Data de Publicação do Edital" id="dt-publicacao-edital" value={dtPublicacaoEdital} onChange={e => setDtPublicacaoEdital(e.target.value)} required className="w-full" />
+									<CalendarYearMonthDay label="Data de Publicação do Edital"
+                    id="dt-publicacao-edital"
+                    value={dtPublicacaoEdital}
+                    onChange={(e) => setDtPublicacaoEdital(e.target.value)}
+                    required
+                    className="w-full"
+                  />
 								</div>
 								<div className="grid gap-3 w-full">
-									<ModalidadeLicitacao value={modalidade} onChange={setModalidade} />
+									<ModalidadeLicitacao 
+                    value={codModalidadeLicitacao}
+                    onChange={setCodModalidadeLicitacao}
+                  />
                 </div>
 								<div className="grid gap-3 w-full">
-									<NaturezaDoObjeto value={naturezaObjeto} onChange={setCodNaturezaObjeto} disabled={modalidade === "4"} />
+									<NaturezaDoObjeto 
+                    value={codNaturezaObjeto}
+                    onChange={setCodNaturezaObjeto}
+                    disabled={codModalidadeLicitacao === "4"}
+                  />
                 </div>
 								<div className="grid gap-3 w-full">
-									<NaturezaDoProcedimento value={codNaturezaProcedimento} onChange={setCodNaturezaProcedimento} />
+									<NaturezaDoProcedimento
+                    value={codNaturezaProcedimento}
+                    onChange={setCodNaturezaProcedimento}
+                  />
 								</div>
 								<div className="grid gap-3 w-full">
-									<RegimeExecucaoObra value={codRegimeObra} onChange={setCodRegimeObra} />
+									<RegimeExecucaoObra
+                    value={codRegimeObra}
+                    onChange={setCodRegimeObra}
+                  />
 								</div>
 								<div className="grid gap-3 w-full">
-									<CalendarYearMonthDay label="Competência" id="dt-competencia" value={competencia} onChange={e => setCompetencia(e.target.value)}/>
+									<CalendarYearMonthDay label="Competência"
+                    id="dt-competencia"
+                    value={competencia}
+                    onChange={e => setCompetencia(e.target.value)}
+                  />
 								</div>
 								<div className="grid gap-3 w-full">
-									<CalendarYearMonthDay label="Limite para Envio da Proposta" id="dt-limite-propostas" value={dtLimitePropostas} onChange={e => setDtLimitePropostas(e.target.value)} />
+									<CalendarYearMonthDay label="Limite para Envio da Proposta"
+                    id="dt-limite-propostas"
+                    value={dtLimitePropostas}
+                    onChange={(e) => setDtLimitePropostas(e.target.value)}
+                  />
 								</div>
 								<div className="grid gap-3 w-full">
-									<InputNumericWithLabel id="num-diario-oficial" label="Número do Diário Oficial" placeholder="35454" maxLength={6} required />
+									<InputNumericWithLabel label="Número do Diário Oficial"
+                    id="num-diario-oficial"
+                    value={numDiarioOficial}
+                    onChange={(e) => setNumDiarioOficial(e.target.value)}
+                    placeholder="35454"
+                    maxLength={6}
+                    required
+                  />
                 </div>
 								<div className="grip gap-3 w-full">
-									<InputString id="nome-veiculo-comunicacao" label="Veículo de Comunicação" placeholder="Diário Oficial do Estado do Amazonas" defaultValue={"Diário Oficial do Estado do Amazonas"} maxLength={50} required className='mt-3'/>
+									<InputString label="Veículo de Comunicação"
+                    id="nome-veiculo-comunicacao" 
+                    value={nomeVeiculoComunicacao}
+                    onChange={(e) => setNomeVeiculoComunicacao(e.target.value)}
+                    placeholder="Diário Oficial do Estado do Amazonas"
+                    maxLength={50}
+                    required 
+                    className='mt-3'
+                  />
 								</div>
               </div>
 						</CardContent>
@@ -297,27 +342,44 @@ export default function Page() {
 						<CardContent>
 							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
 								<div className="grid gap-3 w-full">
-									<TextareaWithLabel id="des-objeto-licitacao" label="Descrição do Objeto da Licitação" maxLength={300} />
+									<TextareaWithLabel label="Descrição do Objeto da Licitação"
+                    id="des-objeto-licitacao"
+                    value={desObjetoLicitacao}
+                    onChange={(e) => setDesObjetoLicitacao(e.target.value)}
+                    maxLength={300}
+                  />
 								</div>
 								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
 									<div className="grid gap-3 w-full">
-										<InputCurrencyBRL id="valor-estimado" title="Total da Despesa Prevista" value={valorEstimado} onValueChange={setValorEstimado} />
+										<InputCurrencyBRL title="Total da Despesa Prevista"
+                    id="vl-total-previsto"
+                    value={vlTotalPrevisto}
+                    onValueChange={setVlTotalPrevisto}
+                  />
 									</div>
 									<div className="grid gap-3 w-full">
-										<InputNumberPNPC id='id-contratacao-pncp' />
+										<InputNumberPNPC 
+                      id='id-contratacao-pncp'
+                      value={idContratacaoPNCP}
+                      onChange={(e) => setIdContratacaoPNCP(e.target.value)}
+                    />
 									</div>
 									<div className="grid gap-3 w-full">
-										<TipoDeLicitacao value={tipoLicitacao} onChange={setCodTipoLicitacao} disabled={modalidade === "4"} />
+										<TipoDeLicitacao
+                      value={codTipoLicitacao}
+                      onChange={setCodTipoLicitacao}
+                      disabled={codModalidadeLicitacao === "4"}
+                    />
 									</div>
 									<div className="grid gap-3 w-full justify-center">
-											<RadioGroup id="tp-item-lote" value={tpItemLote} onValueChange={setTpItemLote}>
-												<div className="flex items-center space-x-2">
-													<RadioGroupItem value="L" id="tp-lote" defaultChecked />
-													<Label htmlFor="tp-lote">Lote</Label>
-													<RadioGroupItem value="I" id="tp-item" />
-													<Label htmlFor="tp=item">Item</Label>
-												</div>
-											</RadioGroup>
+										<RadioGroup id="tp-item-lote" value={tpItemLote} onValueChange={setTpItemLote}>
+											<div className="flex items-center space-x-2">
+												<RadioGroupItem value="L" id="tp-lote" defaultChecked />
+												<Label htmlFor="tp-lote">Lote</Label>
+												<RadioGroupItem value="I" id="tp-item" />
+												<Label htmlFor="tp=item">Item</Label>
+											</div>
+										</RadioGroup>
 									</div>
 								</div>
 							</div>
@@ -416,8 +478,12 @@ export default function Page() {
 													/>
 												</div>
 												<div className="grid gap-3 w-full">
-													<Button id='btn-adicionar-item' onClick={handleAddOrEdit} className='bg-green-900 text-white hover:bg-green-700 hover:text-lg active:bg-green-600 active:scale-95 transition-all duration-150'>
-														{editIndex !== null ? 'SALVAR ALTERAÇÕES' : 'ADICIONAR ITEM'}
+													<Button
+                            id='btn-adicionar-item'
+                            onClick={handleAddOrEdit}
+                            className='bg-green-900 text-white hover:bg-green-700 hover:text-lg active:bg-green-600 active:scale-95 transition-all duration-150'
+                          >
+													  {editIndex !== null ? 'SALVAR ALTERAÇÕES' : 'ADICIONAR ITEM'}
 													</Button>
 												</div>
 											</div>
@@ -443,28 +509,28 @@ export default function Page() {
 								<Button
 									id='btn-gerar-licitacao-json'
 									className='hover:bg-gray-700 active:bg-green-600 active:scale-95'
-									onClick={handleGerarLicitacaoJson}
+									onClick={generateAndDownloadLicitacaoJson}
 								>
 									8.5 - LICITACAO.JSON
 								</Button>
 								<Button
 									id='btn-gerar-itemlicitacao-json'
 									className='hover:bg-gray-700 active:bg-green-600 active:scale-95'
-									onClick={handleGerarItemLicitacaoJson}
+									onClick={generateAndDownloadItemLicitacaoJson}
 								>
 									8.6 - ITEMLICITACAO.JSON
 								</Button>
 								<Button
 									id='btn-gerar-licitacaohistorico-json'
 									className='hover:bg-gray-700 active:bg-green-600 active:scale-95'
-									onClick={handleGerarLicitacaoHistoricoJson}
+									onClick={generateAndDownloadLicitacaoHistoricoJson}
 								>
 									8.7 - LICITACAOHISTORICO.JSON
 								</Button>
 								<Button
 									id='btn-gerar-publicacao-json'
 									className='hover:bg-gray-700 active:bg-green-600 active:scale-95'
-									onClick={handleGerarPublicacaoJson}
+									onClick={generateAndDownloadPublicacaoJson}
 								>
 									8.15 - PUBLICACAO.JSON
 								</Button>
