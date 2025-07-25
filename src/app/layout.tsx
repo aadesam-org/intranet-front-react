@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { AppSidebar } from '@/components/shadcn/sidebar/app-sidebar'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { SidebarProvider } from '@/components/shadcn/ui/sidebar'
@@ -23,9 +22,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SidebarProvider>
-          {children}
-        </SidebarProvider>
+        <SidebarProvider>{children}</SidebarProvider>
       </body>
     </html>
   )

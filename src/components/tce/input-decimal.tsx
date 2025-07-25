@@ -1,9 +1,9 @@
 'use client'
 
-import { Input } from "@/components/shadcn/ui/input"
-import { Label } from "@/components/shadcn/ui/label"
+import { Input } from '@/components/shadcn/ui/input'
+import { Label } from '@/components/shadcn/ui/label'
 
-interface InputDecimalProps extends React.ComponentProps<"input"> {
+interface InputDecimalProps extends React.ComponentProps<'input'> {
   label: string
   maxLength?: number
 }
@@ -16,7 +16,6 @@ export function InputDecimal({
   onChange,
   ...props
 }: InputDecimalProps) {
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
 
@@ -30,16 +29,19 @@ export function InputDecimal({
 
   return (
     <>
-      <Label htmlFor={id}>{label}{props.required && <span className="text-red-500 ml-1">*</span>}</Label>
+      <Label htmlFor={id}>
+        {label}
+        {props.required && <span className="ml-1 text-red-500">*</span>}
+      </Label>
       <Input
         id={id}
         type="number"
         inputMode="decimal"
         pattern="[0-9]*"
         maxLength={maxLength}
-				placeholder={props.placeholder}
-				required
-				className={`appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [MozAppearance:textfield] ${className ?? ""}`}
+        placeholder={props.placeholder}
+        required
+        className={`[MozAppearance:textfield] appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${className ?? ''}`}
         onChange={handleChange}
         {...props}
       />
