@@ -301,7 +301,6 @@ export default function Page() {
                     value={dtPublicacaoEdital}
                     onChange={e => setDtPublicacaoEdital(e.target.value)}
                     required
-                    className="w-full"
                   />
                 </div>
 

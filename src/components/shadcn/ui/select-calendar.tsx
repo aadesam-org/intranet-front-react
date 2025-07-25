@@ -13,10 +13,9 @@ import { ptBR } from "date-fns/locale"
 export function CalendarYearMonthDay({ label, id, value, onChange, ...props }: {
 	label: string,
 	id: string,
-	className?: string,
 	required?: boolean,
 	value?: string,
-	onChange?: (e: any) => void,
+	onChange?: (e: { target: { id: string; value: string } }) => void;
 }) {
 
   const [open, setOpen] = React.useState(false)

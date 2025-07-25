@@ -32,6 +32,11 @@ module.exports = {
     'prettier/prettier': 'warn'
   },
   settings: {
+    "import/resolver": {
+      "typescript": {
+        "project": "./tsconfig.json"
+      }
+    },
     react: {
       version: 'detect'
     }
