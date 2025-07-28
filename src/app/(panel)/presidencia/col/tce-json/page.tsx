@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState } from 'react'
-import { AppSidebar } from '@/components/shadcn/sidebar/app-sidebar'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,7 +10,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/shadcn/ui/breadcrumb'
 import { Separator } from '@/components/shadcn/ui/separator'
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/shadcn/ui/sidebar'
+import { SidebarTrigger } from '@/components/shadcn/ui/sidebar'
 import {
   Card,
   CardContent,
@@ -225,9 +224,8 @@ export default function Page() {
   }
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
+    <>
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
@@ -253,7 +251,6 @@ export default function Page() {
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <Card>
             <CardHeader>
               <CardTitle className="text-3xl font-bold">Arquivos de Atos Jurídicos</CardTitle>
@@ -568,7 +565,6 @@ export default function Page() {
             </CardFooter>
           </Card>
         </div>
-      </SidebarInset>
-    </SidebarProvider>
+    </>
   )
 }

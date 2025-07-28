@@ -59,11 +59,11 @@ const data = {
     },
     {
       title: 'Comissão Licitação - COL',
-      url: 'presidencia/col',
+      url: '#',
       items: [
         {
           title: 'TCE - e-Contas',
-          url: 'presidencia/col/tce-json',
+          url: '/presidencia/col/tce-json',
         },
       ],
     },
@@ -124,7 +124,7 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({children, ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -156,6 +156,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser user={data.user} />
       </SidebarFooter>
       <SidebarRail />
+      {children}
     </Sidebar>
   )
 }
