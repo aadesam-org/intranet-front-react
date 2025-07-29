@@ -29,7 +29,6 @@ const data = {
     {
       title: 'Diretor-Presidente',
       url: '#',
-      isActive: true,
       items: [
         {
           title: 'Repasse Financeiro',
@@ -59,11 +58,11 @@ const data = {
     },
     {
       title: 'Comissão Licitação - COL',
-      url: '#',
+      url: '/intranet/presidencia/col',
       items: [
         {
           title: 'TCE - e-Contas',
-          url: '/presidencia/col/tce-json',
+          url: '/intranet/presidencia/col/tce-json',
         },
       ],
     },
@@ -124,7 +123,7 @@ const data = {
   ],
 }
 
-export function AppSidebar({children, ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ children, ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
